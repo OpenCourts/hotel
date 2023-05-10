@@ -1,0 +1,20 @@
+[global.limits]
+json = 5242880
+
+[default]
+address = "127.0.0.1"
+port = 8000
+keep_alive = 0
+read_timeout = 5
+write_timeout = 5
+limits = { forms = 65536 }
+
+[debug]
+ROCKET_PROFILE = "debug"
+workers = 2
+log = "debug"
+
+[release]
+ROCKET_PROFILE = "release"
+workers = 2
+log = "critical"
