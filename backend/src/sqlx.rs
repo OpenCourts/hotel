@@ -6,7 +6,7 @@ use rocket_db_pools::{sqlx, Database};
 use sqlx::{PgPool};
 
 #[derive(Database)]
-#[database("monkey_db")]
+#[database("postgres")]
 pub struct Db(PgPool);
 
 async fn run_migrations(rocket: Rocket<Build>) -> fairing::Result {
