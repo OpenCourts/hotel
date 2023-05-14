@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate rocket;
 
-use rocket::{Build, Request, Rocket};
+use rocket::{Build, /*Request,*/ Rocket};
 use rocket::fs::FileServer;
 
 pub mod api;
