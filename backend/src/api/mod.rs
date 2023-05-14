@@ -6,8 +6,8 @@ pub fn build_api(rc: Rocket<Build>, base: &str) -> Rocket<Build> {
     rc.mount(
         base,
         routes![
-            handler::get_hotels,
-            handler::get_hotel
+        handler::get_hotels,
+        handler::get_hotel
         ],
     )
 }
