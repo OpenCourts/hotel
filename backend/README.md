@@ -25,3 +25,9 @@ cd yourprojectname && rustup override set nightly
 ```bash
 cargo run
 ```
+
+
+## Configuration
+### Environment Variables:
+- DATABASE_URL
+  - example value: DATABASE_URL=postgres://monkey_user:monkey_pass@localhost/monkey_db

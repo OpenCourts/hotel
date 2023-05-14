@@ -5,8 +5,7 @@ edition = "2021"
 publish = false
 
 [dependencies]
-chrono = { version = "0.4.24", features = ["serde"] }
 rocket = { version = "0.5.0-rc.3", features = ["json"] }
-serde = { version = "1.0.159", features = ["derive"] }
-uuid = { version = "1.3.1", features = ["v4"] }
-scylla = "0.8.1"
+sqlx = { version = "0.6.3", features = ["postgres", "macros", "offline", "migrate"], default-features = false }
+rocket_db_pools = { version = "=0.1.0-rc.3", features = ["sqlx_sqlite"] }
+serde = "1.0.163"
