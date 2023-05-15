@@ -15,7 +15,7 @@ cargo install cargo-generate
 ```
 2. Clone the Rocket application:
 ```bash
-cargo generate --git https://github.com/k0pernicus/cargo-template-rocket-base --name yourprojectname
+cargo generate --git https://github.com/k0pernicus/cargo-_template-rocket-base --name yourprojectname
 ```
 3. Override the default toolchain in `yourprojectname`:
 ```bash
@@ -33,5 +33,8 @@ cargo run
 - DATABASE_PASS
 - DATABASE_HOST
 - DATABASE_NAME
-
-  - example value: DATABASE_USER=monkey_user;DATABASE_PASS=monkey_pass;DATABASE_HOST=localhost:5432;DATABASE_NAME=monkey_db
+- SMTP_USERNAME
+- SMTP_PASSWORD
+- SMTP_SERVER
+- SMTP_PORT (optional)
+  - example value: DATABASE_USER=monkey_user;DATABASE_PASS=monkey_pass;DATABASE_HOST=localhost:5432;DATABASE_NAME=monkey_db;SMTP_USERNAME=example@mydomain.com;SMTP_PASSWORD=my_secret_password;SMTP_SERVER=smtp.mydomain.com;SMTP_PORT=587
