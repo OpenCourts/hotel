@@ -5,7 +5,6 @@ use rocket::{Build, /*Request,*/ Rocket};
 use rocket::fs::FileServer;
 
 pub mod api;
-pub mod model;
 mod sqlx;
 
 
@@ -16,8 +15,7 @@ fn not_found(req: &Request) -> String {
 
 #[launch]
 pub fn rocket() -> Rocket<Build> {
-    let app_data = model::AppState::init();
-    let mut rc = rocket::build().manage(app_data)
+    let mut rc = rocket::build()
         .attach(sqlx::stage())
         .mount("/", FileServer::from("static/"));
         //.register("/", catchers![not_found]);
