@@ -29,5 +29,9 @@ cargo run
 
 ## Configuration
 ### Environment Variables:
-- DATABASE_URL
-  - example value: DATABASE_URL=postgres://monkey_user:monkey_pass@localhost/monkey_db
+- DATABASE_USER
+- DATABASE_PASS
+- DATABASE_HOST
+- DATABASE_NAME
+
+  - example value: DATABASE_USER=monkey_user;DATABASE_PASS=monkey_pass;DATABASE_HOST=localhost:5432;DATABASE_NAME=monkey_db
