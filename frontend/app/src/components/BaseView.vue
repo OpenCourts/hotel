@@ -1,7 +1,9 @@
 <template>
   <div class="page">
     <the-header />
-    <slot> </slot>
+    <div class="mt-10">
+      <slot> </slot>
+    </div>
     <the-footer />
   </div>
 </template>
