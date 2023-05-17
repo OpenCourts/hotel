@@ -7,7 +7,8 @@ pub fn build_api(rc: Rocket<Build>, base: &str) -> Rocket<Build> {
         base,
         routes![
         handler::get_hotels,
-        handler::get_hotel
+        handler::get_hotel,
+        handler::get_room_types
         ],
     )
 }

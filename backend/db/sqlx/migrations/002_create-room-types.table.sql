@@ -6,5 +6,5 @@ CREATE TABLE IF NOT EXISTS room_types
     size            INTEGER,
     capacity        INTEGER,
     amenities       VARCHAR(255),
-    price_per_night DECIMAL(10, 2)
+    price_per_night INTEGER
 );
