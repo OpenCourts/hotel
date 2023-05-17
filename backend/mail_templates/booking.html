@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Booking Confirmation</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        p {
+            margin-bottom: 10px;
+        }
+
+        .container {
+            max-width: 600px;
+            background-color: #333333;
+            margin: 0 auto;
+            padding-bottom: 30px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2px;
+        }
+
+        .header img {
+            max-width: 200px;
+        }
+
+        .content {
+            border-radius: 10px;
+            padding-bottom: 30px;
+            padding-left: 30px;
+            padding-right: 30px;
+            color: #FFFFFF;
+        }
+
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            color: #FFFFFF;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <br/>
+    <div class="header">
+        <img src="https://logos-world.net/wp-content/uploads/2021/02/Hilton-Emblem.png" alt="Six Star Hotels">
+    </div>
+    <div class="content">
+        <h3>Room Booking Confirmation</h3>
+        <p>Dear {{ recipient }},</p>
+        <p>Your room booking has been confirmed. Here are the details:</p>
+        <p><strong>Booking ID:</strong> {{ booking_id }}</p>
+        <p><strong>Room:</strong> {{ room_number }}</p>
+        <p><strong>Booking Date:</strong> {{ booking_date }}</p>
+        <p><strong>Duration:</strong> {{ booking_duration }}</p>
+        <p><strong>Amount:</strong> {{ booking_amount }}</p>
+        <br/>
+        <p>Thank you for choosing our services. We look forward to hosting you!</p>
+    </div>
+    <hr />
+<div class="footer">
+    <p>&copy; 2023 Six Star Hotels. All rights reserved.</p>
+</div>
+</div>
+</body>
+</html>
