@@ -5,8 +5,11 @@ edition = "2021"
 publish = false
 
 [dependencies]
+chrono = "0.4.24"
 rocket = { version = "0.5.0-rc.3", features = ["json"] }
 sqlx = { version = "0.6.3", features = ["postgres", "macros", "offline", "migrate"], default-features = false }
 rocket_db_pools = { version = "=0.1.0-rc.3", features = ["sqlx_sqlite"] }
 serde = "1.0.163"
-tokio = "1.28.1"
+tokio = { version = "1.28.1", features = ["full"] }
+lettre = { version = "0.10.4", default-features = false, features = ["smtp-transport", "tokio1-rustls-tls", "hostname", "builder"] }
+tera = "1.0.2"
