@@ -2,9 +2,11 @@
   <v-app-bar
     class="py-2"
     color="#444"
-    scroll-behavior="fade-image inverted"
-    scroll-threshold="600"
-    image="https://www.parkhotelleipzig.de/wp-content/uploads/2016/07/park-hotel-fassade-jugendstil.jpg"
+    style="
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.8)),
+        url(https://www.parkhotelleipzig.de/wp-content/uploads/2016/07/park-hotel-fassade-jugendstil.jpg)
+          center center / cover no-repeat;
+    "
   >
     <v-container>
       <v-row no-gutters class="mt-2">

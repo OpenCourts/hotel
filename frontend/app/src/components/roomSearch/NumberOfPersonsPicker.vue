@@ -15,35 +15,17 @@
             <v-col cols="4" class="text-overline text-right"> Adults </v-col>
             <v-col>
               <v-btn-group elevation="2">
-                <v-btn size="small"
+                <v-btn
+                  size="small"
                   :disabled="valuePersons == minPersons || valueAdults == 0"
                   @click="valueAdults--"
                   ><v-icon>mdi-minus</v-icon></v-btn
                 >
                 <v-label class="px-5">{{ valueAdults }}</v-label>
-                <v-btn size="small"
+                <v-btn
+                  size="small"
                   :disabled="valuePersons == maxPersons"
                   @click="valueAdults++"
-                  ><v-icon>mdi-plus</v-icon></v-btn
-                >
-              </v-btn-group>
-            </v-col>
-          </v-row>
-        </v-list-item>
-        <v-list-item>
-          <v-row justify="center" align="center">
-            <v-col cols="4" class="text-overline text-right"> Children </v-col>
-            <v-col>
-              <v-btn-group elevation="2">
-                <v-btn size="small"
-                  :disabled="valuePersons == minPersons || valueChildren == 0"
-                  @click="valueChildren--"
-                  ><v-icon>mdi-minus</v-icon></v-btn
-                >
-                <v-label class="px-5">{{ valueChildren }}</v-label>
-                <v-btn size="small"
-                  :disabled="valuePersons == maxPersons"
-                  @click="valueChildren++"
                   ><v-icon>mdi-plus</v-icon></v-btn
                 >
               </v-btn-group>
@@ -56,6 +38,7 @@
 </template>
 
 <script>
+import { mapMutations, mapState } from "vuex";
 export default {
   name: "number-of-persons-picker",
   data() {
@@ -68,27 +51,37 @@ export default {
     };
   },
   computed: {
+    ...mapState("roomType", ["apiFilters"]),
     valuePersons() {
       return this.valueAdults + this.valueChildren;
     },
     numberOfPersonsString() {
-      return `${this.valuePersons} person${
-        this.valuePersons == 1 ? "" : "s"
-      } (${this.valueAdults} adult${this.valueAdults == 1 ? "" : "s"}, ${
-        this.valueChildren
-      } child${this.valueChildren == 1 ? "" : "ren"})`;
+      return `${this.valuePersons} person${this.valuePersons == 1 ? "" : "s"}`;
+    },
+  },
+  watch: {
+    valuePersons: {
+      handler: function () {
+        this.updateGuests();
+      },
     },
   },
   methods: {
-    getHotelSearchString(hotel) {
-      return `${hotel.location}, ${hotel.name}`;
+    ...mapMutations("roomType", ["setApiFilters"]),
+    updateGuests() {
+      this.setApiFilters({ guests: this.valuePersons });
     },
+  },
+  created() {
+    this.valueAdults = this.apiFilters.guests ?? 1;
+    this.updateGuests()
   },
 };
 </script>
 
 <style>
-.pointer, .pointer * {
+.pointer,
+.pointer * {
   cursor: pointer !important;
 }
 </style>
