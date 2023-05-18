@@ -6,6 +6,11 @@
     dark
     :enable-time-picker="false"
     :min-date="minDate"
+    model-type="yyyy.MM.dd"
+    auto-apply 
+    :close-on-auto-apply="false"
+    disable-year-select 
+    placeholder="When are you travelling?"
   />
 </template>
 

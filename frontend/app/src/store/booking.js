@@ -17,11 +17,11 @@ const bookingModule = {
     },
 
     mutations: {
-        setBooking(state, booking) {
-            state.startDate = booking.startDate
-            state.endDate = booking.endDate
-            state.guests = booking.guests
-            state.roomTypeId = booking.roomTypeId
+        setBookingInformation(state, bookingInformation) {
+            state.startDate = bookingInformation.startDate ? bookingInformation.startDate : state.startDate
+            state.endDate = bookingInformation.endDate ? bookingInformation.endDate : state.endDate
+            state.guests = bookingInformation.guests ? bookingInformation.guests : state.guests
+            state.roomTypeId = bookingInformation.roomTypeId ? bookingInformation.roomTypeId : state.roomTypeId
         },
     },
 

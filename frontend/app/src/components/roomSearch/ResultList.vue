@@ -2,7 +2,33 @@
   <v-container v-if="filteredRoomTypes.length > 0">
     <v-row v-for="roomType in filteredRoomTypes" :key="roomType.id">
       <v-col>
-        <room-type-result :roomType="roomType" @goToBooking="goToBooking" />
+        <v-hover>
+          <template v-slot:default="{ isHovering, props }">
+            <room-type-result
+              :roomType="roomType"
+              @goToBooking="goToBooking"
+              v-bind="props"
+            >
+              <template #overlay>
+                <v-overlay
+                  @click="goToBooking(roomType)"
+                  :model-value="isHovering"
+                  contained
+                  scrim="black"
+                  class="align-center justify-end"
+                  style="cursor: pointer"
+                >
+                  <v-btn
+                    @click="goToBooking(roomType)"
+                    variant="outlined"
+                    class="mr-5"
+                    >Book now</v-btn
+                  >
+                </v-overlay>
+              </template>
+            </room-type-result>
+          </template>
+        </v-hover>
       </v-col>
     </v-row>
   </v-container>
@@ -23,7 +49,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapMutations } from "vuex";
 import RoomTypeResult from "./RoomTypeResult.vue";
 export default {
   components: { RoomTypeResult },
@@ -32,7 +58,9 @@ export default {
     ...mapGetters("roomType", ["filteredRoomTypes"]),
   },
   methods: {
-    goToBooking() {
+    ...mapMutations("booking", ["setBookingInformation"]),
+    goToBooking(roomType) {
+      this.setBookingInformation({ roomTypeId: roomType.id });
       this.$router.push({ name: "roomBook" });
     },
   },

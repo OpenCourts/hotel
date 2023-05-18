@@ -4,6 +4,7 @@ import RoomSearchPage from "@/views/RoomSearchPage"
 import RoomBookPage from "@/views/RoomBookPage"
 import BookingSuccessPage from "@/views/BookingSuccessPage"
 import NotFoundPage from "@/views/NotFoundPage"
+import store from '@/store'
 
 const routes = [
   {
@@ -19,7 +20,8 @@ const routes = [
   {
     path: '/book',
     name: 'roomBook',
-    component: RoomBookPage
+    component: RoomBookPage,
+    meta: { requiresRoomType: true }
   },
   {
     path: '/success',
@@ -36,6 +38,20 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
+})
+
+router.beforeEach((to, _, next) => {
+  console.log(store.state.booking.roomTypeId)
+  console.log(store.state["booking/roomTypeId"])
+  if (to.meta.requiresRoomType) {
+    if (!store.state.booking.roomTypeId) {
+      next({ name: "roomSearch" })
+      return
+    }
+    next()
+    return
+  }
+  next()
 })
 
 export default router
