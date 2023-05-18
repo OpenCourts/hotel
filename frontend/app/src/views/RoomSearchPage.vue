@@ -1,15 +1,19 @@
 <template>
   <base-view>
-    <v-container>
+    <v-container v-if="!isLoading">
       <v-row>
         <v-col cols="4">
-          <hotel-picker />
+          <hotel-picker :disabled="loadingRoomTypes" />
         </v-col>
-        <v-col cols="3"> <number-of-persons-picker /> </v-col>
-        <v-col cols="3"> <date-range-picker /></v-col>
+        <v-col cols="3">
+          <number-of-persons-picker :disabled="loadingRoomTypes" />
+        </v-col>
+        <v-col cols="3">
+          <date-range-picker :disabled="loadingRoomTypes"
+        /></v-col>
         <v-col cols="2">
           <v-btn
-            :disabled="!allApiFiltersSet"
+            :disabled="!allApiFiltersSet || loadingRoomTypes"
             @click="searchRoomTypes"
             style="height: 4em; width: 100%"
             >Search</v-btn
@@ -18,7 +22,24 @@
       </v-row>
       <v-row>
         <v-col cols="4"><filter-list /></v-col>
-        <v-col cols="8"><result-list v-if="hasClickedSearch || roomTypes.length > 0" /></v-col>
+        <v-col cols="8">
+          <div
+            :style="`opacity: ${
+              hasClickedSearch && loadingRoomTypes ? 0.5 : 1
+            }; transition: all .1s`"
+          >
+            <base-spinner v-if="loadingRoomTypes && !hasClickedSearch" />
+            <result-list
+              v-else-if="hasClickedSearch || roomTypes.length > 0"
+            /></div
+        ></v-col>
+      </v-row>
+    </v-container>
+    <v-container class="fill-height" v-else>
+      <v-row justify="center" align="center">
+        <v-col class="text-center">
+          <base-spinner />
+        </v-col>
       </v-row>
     </v-container>
   </base-view>
@@ -26,6 +47,7 @@
 
 <script>
 import { mapActions, mapState } from "vuex";
+import BaseSpinner from "../components/BaseSpinner.vue";
 import BaseView from "../components/BaseView.vue";
 import DateRangePicker from "../components/roomSearch/DateRangePicker.vue";
 import FilterList from "../components/roomSearch/FilterList.vue";
@@ -40,11 +62,14 @@ export default {
     DateRangePicker,
     FilterList,
     ResultList,
+    BaseSpinner,
   },
   name: "room-search-page",
   data() {
     return {
       hasClickedSearch: false,
+      isLoading: false,
+      loadingRoomTypes: false,
     };
   },
   computed: {
@@ -57,10 +82,31 @@ export default {
   },
   methods: {
     ...mapActions("roomType", ["loadRoomTypes"]),
-    async searchRoomTypes() {
-      await this.loadRoomTypes();
-      this.hasClickedSearch = true;
+    ...mapActions("hotel", ["loadHotels"]),
+    async searchHotels() {
+      this.isLoading = true;
+      try {
+        await this.loadHotels();
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.isLoading = false;
+      }
     },
+    async searchRoomTypes() {
+      this.loadingRoomTypes = true;
+      try {
+        await this.loadRoomTypes();
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.hasClickedSearch = true;
+        this.loadingRoomTypes = false;
+      }
+    },
+  },
+  async created() {
+    await this.searchHotels();
   },
 };
 </script>

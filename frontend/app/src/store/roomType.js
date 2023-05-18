@@ -1,3 +1,5 @@
+import { makeJsonRequest } from "@/helpers/requestHelper"
+
 const roomTypeModule = {
     namespaced: true,
 
@@ -56,6 +58,7 @@ const roomTypeModule = {
     actions: {
         async loadRoomTypes({ commit }) {
             // const roomTypes = makeJsonRequest("/search", "GET");
+            await makeJsonRequest("/hotels", "GET")
             commit("setRoomTypes", [
                 {
                     id: 1,

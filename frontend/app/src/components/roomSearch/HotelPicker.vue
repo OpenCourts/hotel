@@ -7,13 +7,14 @@
     label="Where to go?"
     variant="outlined"
     @update:modelValue="updateHotel"
+    single-line
   >
     <template v-slot:item="{ item, props }">
       <v-list-item
         class="py-2"
         v-bind="props"
         prepend-icon="mdi-map-marker"
-        :title="item?.raw?.location"
+        :title="`${item?.raw?.city}, ${item?.raw?.country}`"
         :subtitle="item?.raw?.name"
       ></v-list-item>
     </template>
@@ -35,8 +36,8 @@ export default {
   computed: {
     ...mapState("hotel", ["hotels"]),
     ...mapState("roomType", ["apiFilters"]),
-    locations() {
-      return this.hotels.map((h) => h.location);
+    cities() {
+      return this.hotels.map((h) => h.city);
     },
     selectedHotel() {
       return this.hotels.find((h) => h.id == this.selectedHotelId);
@@ -45,7 +46,7 @@ export default {
   methods: {
     ...mapMutations("roomType", ["setApiFilters"]),
     getHotelSearchString(hotel) {
-      return `${hotel.location}, ${hotel.name}`;
+      return `${hotel.name} (${hotel.city}, ${hotel.country})`;
     },
     updateHotel() {
       this.setApiFilters({ hotelId: this.selectedHotelId });
