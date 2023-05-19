@@ -69,7 +69,6 @@
         </p>
       </v-row>
     </v-container>
-    <image-carousel />
   </base-view>
 </template>
 

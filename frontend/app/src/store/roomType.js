@@ -34,6 +34,20 @@ const roomTypeModule = {
                 }
                 return true
             })
+        },
+        startDate(state) {
+            const parts = state.apiFilters.startDate.split(".")
+            return new Date(parts[0], parts[1] - 1, parts[2])
+        },
+        endDate(state) {
+            const parts = state.apiFilters.endDate.split(".")
+            return new Date(parts[0], parts[1] - 1, parts[2])
+        },
+        dateRange(_, getters) {
+            const diff = getters.endDate - getters.startDate
+            console.log(getters)
+            console.log(diff)
+            return Math.ceil(diff / (1000 * 60 * 60 * 24));
         }
     },
 
@@ -69,18 +83,20 @@ const roomTypeModule = {
                     amenities: ['tv', 'beach', 'whirlpool'],
                     pricePerNight: 59,
                     availableRooms: 12,
-                    image: null
+                    image: null,
+                    rooms: 12
                 },
                 {
                     id: 2,
-                    name: 'Comfort Apartment',
+                    name: 'Luxus Apartment',
                     description: 'text text text text text text text text text text text text text text text text text text ',
                     size: 50,
-                    capacity: 8,
+                    capacity: 4,
                     amenities: ['tv', 'kitchen'],
-                    pricePerNight: 59,
+                    pricePerNight: 219,
                     availableRooms: 12,
-                    image: null
+                    rooms: 4,
+                    image: "https://cf.bstatic.com/xdata/images/hotel/max1024x768/301944448.jpg?k=9bb7ff454f4298bc2a036b8eda69cc6cc11c6de05d9ce4d92c664a281b83cec7&o=&hp=1"
                 }
             ])
         }

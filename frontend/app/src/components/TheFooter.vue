@@ -1,5 +1,5 @@
 <template>
-  <v-bottom-navigation> </v-bottom-navigation>
+  <v-bottom-navigation absolute> </v-bottom-navigation>
 </template>
 
 <script>

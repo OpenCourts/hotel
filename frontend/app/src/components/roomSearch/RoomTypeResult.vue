@@ -1,10 +1,24 @@
 <template>
-  <v-card class="roomType">
+  <v-card
+    :style="`background: linear-gradient(
+      to right,
+      rgba(30, 30, 30, 1),
+      rgba(30, 30, 30, 1),
+      rgba(30, 30, 30, 1),
+      rgba(30, 30, 30, 0.8),
+      rgba(30, 30, 30, 0)
+    ),
+    url(${imageUrl})
+      center center / cover no-repeat;
+    transition: all 0.1s;`"
+  >
     <slot name="overlay" />
     <v-container>
-      <v-row dense>
+      <v-row dense align="center" justify="center">
         <v-col>
-          <p class="text-h5">{{ roomType.name }}</p>
+          <span class="text-h4">
+            {{ roomType.name }}
+          </span>
         </v-col>
       </v-row>
       <v-row dense>
@@ -32,13 +46,9 @@
       <v-row>
         <v-col>
           <v-chip prepend-icon="mdi-currency-eur">
-            <span
-              justify="center"
-              align="center"
-              size="large"
-              style="font-size: 1.8em"
-              >{{ roomType.pricePerNight }}</span
-            ></v-chip
+            <span justify="center" align="center" style="font-size: 1.5em">{{
+              roomType.pricePerNight
+            }}</span></v-chip
           >
           <v-label
             style="
@@ -52,11 +62,24 @@
           </v-label>
         </v-col>
       </v-row>
+      <div style="position: absolute; top: 0; right: 0">
+        <v-col>
+          <v-chip
+            prepend-icon="mdi-currency-eur"
+            size="x-large"
+            color="white"
+            style="background-color: rgba(0, 0, 0, 0.8); pointer-events: none"
+          >
+            <span style="font-size: 1.8em">{{ priceTotal }}</span></v-chip
+          >
+        </v-col>
+      </div>
     </v-container>
   </v-card>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 export default {
   name: "room-type-result",
   emits: ["goToBooking"],
@@ -66,21 +89,20 @@ export default {
       required: true,
     },
   },
+  computed: {
+    ...mapGetters("roomType", ["dateRange"]),
+    imageUrl() {
+      return (
+        this.roomType.image ??
+        "https://www.parkhotelleipzig.de/wp-content/uploads/2016/07/park-hotel-fassade-jugendstil.jpg"
+      );
+    },
+    priceTotal() {
+      return this.roomType.pricePerNight * this.dateRange;
+    },
+  },
 };
 </script>
 
 <style>
-.roomType {
-  background: linear-gradient(
-      to right,
-      rgba(30, 30, 30, 1),
-      rgba(30, 30, 30, 1),
-      rgba(30, 30, 30, 1),
-      rgba(30, 30, 30, 0.8),
-      rgba(30, 30, 30, 0)
-    ),
-    url(https://www.parkhotelleipzig.de/wp-content/uploads/2016/07/park-hotel-fassade-jugendstil.jpg)
-      center center / cover no-repeat;
-  transition: all 0.1s;
-}
 </style>
