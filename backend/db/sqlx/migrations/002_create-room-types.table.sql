@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS room_types
     size            INTEGER,
     capacity        INTEGER,
     amenities       VARCHAR(255),
-    price_per_night INTEGER
+    price_per_night INTEGER,
+    image_url       VARCHAR(255)
 );
