@@ -1,7 +1,10 @@
+use std::fs;
+use std::path::{PathBuf};
 use rocket::http::Status;
+use rocket::response::status::Custom;
 use rocket::serde::json::Json;
 use rocket_db_pools::Connection;
-use sqlx::FromRow;
+use sqlx::{FromRow};
 use crate::sqlx::Db;
 
 
@@ -32,6 +35,38 @@ pub struct RoomType {
     price_per_night: i32,
     room_count: i64, //da Postgres 64Bit int zurück gibt
     room_available_count: i64
+}
+
+#[derive(Debug, serde::Serialize)]
+pub struct ErrorResponse {
+    error: String,
+}
+
+#[get("/carousel")]
+pub fn get_carousel() -> Result<Json<Vec<String>>, Custom<Json<ErrorResponse>>> {
+    let folder_path = PathBuf::from("static/images/carousel");
+    let mut paths: Vec<String> = Vec::new();
+
+    if let Ok(entries) = fs::read_dir(folder_path) {
+        for entry in entries {
+            if let Ok(entry) = entry {
+                if let Ok(file_type) = entry.file_type() {
+                    if file_type.is_file() {
+                        if let Ok(file_name) = entry.file_name().into_string() {
+                            let file_path = format!("/images/carousel/{}", file_name);
+                            paths.push(file_path);
+                        }
+                    }
+                }
+            }
+        }
+        Ok(Json(paths))
+    } else {
+        let error_response = ErrorResponse {
+            error: String::from("Failed to read directory"),
+        };
+        Err(Custom(Status::InternalServerError, Json(error_response)))
+    }
 }
 
 #[get("/hotels")]
