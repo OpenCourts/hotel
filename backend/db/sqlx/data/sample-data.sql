@@ -9,13 +9,13 @@ VALUES (1, 'Six Star Hotels Germany Berlin', 'Karl-Liebknecht-Strasse', '5', 'Be
         '+81-3-3344-5111', 250);
 
 -- Room Types
-INSERT INTO room_types (id, name, description, size, capacity, amenities, price_per_night)
+INSERT INTO room_types (id, name, description, size, capacity, amenities, price_per_night, image_url)
 VALUES (1, 'Standard', 'A standard room with a queen size bed and a bathroom.', 300, 2, 'TV, Wi-Fi, Coffee maker',
-        100),
+        100, '/images/rooms/room_standard.jpg'),
        (2, 'Deluxe', 'A deluxe room with a king size bed, a bathroom and a balcony with a view.', 400, 2,
-        'TV, Wi-Fi, Coffee maker, Balcony', 150),
+        'TV, Wi-Fi, Coffee maker, Balcony', 150, '/images/rooms/room_deluxe.jpg'),
        (3, 'Suite', 'A luxurious suite with a king size bed, a living room, a kitchenette and a bathroom.', 600, 4,
-        'TV, Wi-Fi, Coffee maker, Kitchenette, Living room', 300);
+        'TV, Wi-Fi, Coffee maker, Kitchenette, Living room', 300, '/images/rooms/room_suite.jpg');
 
 -- Rooms
 INSERT INTO rooms (id, hotel_id, room_number, room_type_id)
