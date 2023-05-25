@@ -31,7 +31,7 @@ pub struct RoomType {
     size: i32,
     capacity: i32,
     amenities: String,
-    image_url: String,
+    image_url: Option<String>,
     price_per_night: i32,
     room_count: i64, //da Postgres 64Bit int zurück gibt
     room_available_count: i64
@@ -110,9 +110,9 @@ pub async fn get_room_types(from_date: &str, to_date: &str, price_upper: Option<
                                                                             where
                                                                             hotel_id = $3 and room_type_id = rt.id) as room_count,
                                                                             (select count(*) from rooms r2 where r2.id not in (select b.room_id from bookings b where (b.check_in_date, b.check_out_date) overlaps ($1::DATE, $2::DATE))
-                                                                             and r2.room_type_id in (select rt2.id from room_types rt2 where rt2.price_per_night between $4 and $5 and capacity >= $6)
                                                                             and hotel_id = $3 and room_type_id = rt.id) as room_available_count
-                                                                            from room_types rt ")
+                                                                            from room_types rt
+                                                                            where rt.price_per_night between $4 and $5 and rt.capacity >= $6")
         .bind(from_date)
         .bind(to_date)
         .bind(hotel_id)
