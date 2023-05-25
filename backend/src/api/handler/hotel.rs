@@ -22,14 +22,16 @@ pub struct Hotel {
 
 #[derive(FromRow, serde::Serialize)]
 pub struct RoomType {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    id: Option<i32>,
+    id: i32,
     name: String,
     description: String,
     size: i32,
     capacity: i32,
     amenities: String,
-    price_per_night: i32
+    image_url: String,
+    price_per_night: i32,
+    room_count: i64, //da Postgres 64Bit int zurück gibt
+    room_available_count: i64
 }
 
 #[get("/hotels")]
@@ -66,40 +68,19 @@ pub async fn get_hotel(id: i32, mut conn: Connection<Db>) -> Result<Json<Hotel>,
     }
 }
 
-#[get("/hotels/<id>/rooms")]
-pub async fn get_hotel_rooms(id: i32, mut conn: Connection<Db>) -> Result<Json<Hotel>, Status> {
-    let result = sqlx::query_as::<_, Hotel>("SELECT id, name, street, house_number, city, state, postal_code, country, phone_number, total_rooms FROM hotels WHERE id = $1")
-        .bind(id)
-        .fetch_one(&mut *conn)
-        .await;
-
-    match result {
-        Ok(hotel) => Ok(Json(hotel)),
-        Err(error) => {
-            error!("Failed to fetch hotel {}: {:?}", id, error);
-            match error {
-                sqlx::Error::RowNotFound => Err(Status::NotFound),
-                _ => Err(Status::InternalServerError),
-            }
-        }
-    }
-}
-
-#[get("/search?<from_date>&<to_date>&<price_upper>&<price_lower>&<capacity>")]
-pub async fn get_room_types(from_date: &str, to_date: &str, price_upper: Option<i32>, price_lower: Option<i32>, capacity: Option<i32>, mut conn: Connection<Db>) -> Result<Json<Vec<RoomType>>, Status> {
-    let result = sqlx::query_as::<_, RoomType>(" Select * from room_types
-                                                                where id in (select distinct  room_type_id  from rooms
-                                                                where id not in (
-                                                                    select room_id from bookings
-                                                                    where check_in_date >= to_date($1, 'YYYY-MM-DD')
-                                                                    and check_out_date <= to_date($2, 'YYYY-MM-DD'))
-                                                                and room_type_id  in (
-                                                                    select id from room_types
-                                                                    where room_types.price_per_night between $3 and $4
-                                                                    and capacity >= $5))")
-
+#[get("/search?<from_date>&<to_date>&<price_upper>&<price_lower>&<capacity>&<hotel_id>")]
+pub async fn get_room_types(from_date: &str, to_date: &str, price_upper: Option<i32>, price_lower: Option<i32>, capacity: Option<i32>,hotel_id: i32, mut conn: Connection<Db>) -> Result<Json<Vec<RoomType>>, Status> {
+    let result = sqlx::query_as::<_, RoomType>("select rt.*, (select
+                                                                            count(*) from rooms r
+                                                                            where
+                                                                            hotel_id = $3 and room_type_id = rt.id) as room_count,
+                                                                            (select count(*) from rooms r2 where r2.id not in (select b.room_id from bookings b where (b.check_in_date, b.check_out_date) overlaps ($1::DATE, $2::DATE))
+                                                                             and r2.room_type_id in (select rt2.id from room_types rt2 where rt2.price_per_night between $4 and $5 and capacity >= $6)
+                                                                            and hotel_id = $3 and room_type_id = rt.id) as room_available_count
+                                                                            from room_types rt ")
         .bind(from_date)
         .bind(to_date)
+        .bind(hotel_id)
         .bind(match price_lower {
             Some(val) => val,
             None => 1
@@ -116,7 +97,7 @@ pub async fn get_room_types(from_date: &str, to_date: &str, price_upper: Option<
         .await;
 
     match result {
-        Ok(room) => Ok(Json(room)),
+        Ok(rooms) => Ok(Json(rooms)),
         Err(error) => {
             error!("Failed to process Request:{:?}", error);
             match error {
@@ -126,4 +107,5 @@ pub async fn get_room_types(from_date: &str, to_date: &str, price_upper: Option<
         }
     }
 }
+
 
