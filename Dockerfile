@@ -1,21 +1,18 @@
-FROM rust:1.69
+FROM node:15.5.1 as frontend
+RUN npm install -g @vue/cli@5.0.8
 
-RUN apt install curl
-RUN curl -sL https://deb.nodesource.com/setup_18.x | bash -
-RUN apt update
-RUN apt install nodejs
+COPY ./frontend/app /app
 
-RUN npm install -g @vue/cli
-
-COPY . /distributed/
-
-WORKDIR /distributed/frontend/app
+WORKDIR /app
 RUN npm install -f
 RUN npm run build
 
-RUN mv /distributed/frontend/app/dist/ /distributed/backend/static
+FROM rust:1.69 as backend
+COPY ./backend /distributed
 
-WORKDIR /distributed/backend
+COPY --from=frontend /app/dist/ /distributed/static
+
+WORKDIR /distributed
 RUN cargo build --release --bin hotel
 
 EXPOSE 8000
