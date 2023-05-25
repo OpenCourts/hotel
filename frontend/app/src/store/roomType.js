@@ -11,7 +11,11 @@ const roomTypeModule = {
             startDate: null,
             endDate: null,
             guests: null,
-            hotelId: null
+            hotelId: null,
+        },
+        filters: {
+            minPrice: null,
+            maxPrice: null
         }
     },
 
@@ -31,16 +35,17 @@ const roomTypeModule = {
             return state.roomTypes.filter(rt => {
                 for (const activeFilter of state.activeAmenitiesFilters) {
                     if (!rt.amenities.includes(activeFilter)) { return false }
+                    if (rt.pricePerNight > state.filters.maxPrice || rt.pricePerNight < state.filters.minPrice) { return false }
                 }
                 return true
             })
         },
         startDate(state) {
-            const parts = state.apiFilters.startDate.split(".")
+            const parts = state.apiFilters.startDate.split("-")
             return new Date(parts[0], parts[1] - 1, parts[2])
         },
         endDate(state) {
-            const parts = state.apiFilters.endDate.split(".")
+            const parts = state.apiFilters.endDate.split("-")
             return new Date(parts[0], parts[1] - 1, parts[2])
         },
         dateRange(_, getters) {
@@ -66,39 +71,23 @@ const roomTypeModule = {
             state.apiFilters.endDate = filters.endDate ?? state.apiFilters.endDate
             state.apiFilters.guests = filters.guests ?? state.apiFilters.guests
             state.apiFilters.hotelId = filters.hotelId ?? state.apiFilters.hotelId
+        },
+        setFilters(state, filters) {
+            state.filters.minPrice = filters.minPrice ?? state.filters.minPrice
+            state.filters.maxPrice = filters.maxPrice ?? state.filters.maxPrice
         }
     },
 
     actions: {
-        async loadRoomTypes({ commit }) {
-            // const roomTypes = makeJsonRequest("/search", "GET");
-            await makeJsonRequest("/hotels", "GET")
-            commit("setRoomTypes", [
-                {
-                    id: 1,
-                    name: 'Comfort Apartment',
-                    description: 'text text text text text text text text text text text text text text text text text text ',
-                    size: 50,
-                    capacity: 8,
-                    amenities: ['tv', 'beach', 'whirlpool'],
-                    pricePerNight: 59,
-                    availableRooms: 12,
-                    image: null,
-                    rooms: 12
-                },
-                {
-                    id: 2,
-                    name: 'Luxus Apartment',
-                    description: 'text text text text text text text text text text text text text text text text text text ',
-                    size: 50,
-                    capacity: 4,
-                    amenities: ['tv', 'kitchen'],
-                    pricePerNight: 219,
-                    availableRooms: 12,
-                    rooms: 4,
-                    image: "https://cf.bstatic.com/xdata/images/hotel/max1024x768/301944448.jpg?k=9bb7ff454f4298bc2a036b8eda69cc6cc11c6de05d9ce4d92c664a281b83cec7&o=&hp=1"
-                }
-            ])
+        async loadRoomTypes({ commit, state }) {
+            const searchString = `/search?from_date=${state.apiFilters.startDate}&to_date=${state.apiFilters.endDate}&capacity=${state.apiFilters.guests}&hotel_id=${state.apiFilters.hotelId}`
+            const roomTypes = await makeJsonRequest(searchString, "GET");
+            roomTypes.forEach((rt) => {
+                rt.pricePerNight = rt.price_per_night;
+                rt.amenities = rt.amenities.split(", ");
+                rt.availableRooms = rt.room_available_count ?? 2
+            })
+            commit("setRoomTypes", roomTypes)
         }
     }
 }

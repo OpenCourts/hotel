@@ -8,7 +8,7 @@
 
 <script>
 import Flicking from "@egjs/vue3-flicking";
-import { AutoPlay, Parallax } from "@egjs/flicking-plugins";
+import { AutoPlay, Fade } from "@egjs/flicking-plugins";
 import "@egjs/vue3-flicking/dist/flicking.css";
 import "@egjs/flicking-plugins/dist/flicking-plugins.css";
 import "@egjs/flicking-plugins/dist/arrow.css";
@@ -20,7 +20,7 @@ const plugins = [
     stopOnHover: false,
     delayAfterHover: true,
   }),
-  new Parallax("img", 1),
+  new Fade()
 ];
 
 export default {
@@ -31,18 +31,16 @@ export default {
   data() {
     return {
       images: [
-        "https://images.unsplash.com/photo-1524781289445-ddf8f5695861?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80",
-        "https://img.welt.de/img/vermischtes/bilder-des-tages/mobile243173239/9812507287-ci102l-w1024/Knowsley-Safari-recycelt-alte-Weihnachtsbaeume.jpg",
-        "https://assets.pixolum.com/blog/wp-content/uploads/2016/10/focus-stacking-scharfe-bilder-1.jpg",
-        "https://picsum.photos/id/41/600/400/",
-        "https://images.unsplash.com/photo-1524781289445-ddf8f5695861?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80",
-        "https://img.welt.de/img/vermischtes/bilder-des-tages/mobile243173239/9812507287-ci102l-w1024/Knowsley-Safari-recycelt-alte-Weihnachtsbaeume.jpg",
-        "https://assets.pixolum.com/blog/wp-content/uploads/2016/10/focus-stacking-scharfe-bilder-1.jpg",
-        "https://picsum.photos/id/41/600/400/",
-      ],
+        "https://pix10.agoda.net/hotelImages/124/1246280/1246280_16061017110043391702.jpg?ca=6&ce=1&s=1024x768",
+        "https://media-cdn.tripadvisor.com/media/photo-s/29/0c/e6/3a/entrance-hotel-artemide.jpg",
+        "https://cf.bstatic.com/xdata/images/xphoto/540x405/12097111.jpg?k=ab8d257011c475ed67db40f6ad3dc6339a0ca882f606e5585365ab16411b00d1&o=",
+        "https://www.lopesan.com/img/hotels/5867/600-1000-imagen-emblematica-hotel-corallium-beach-by-lopesan-hotels-san-agustin-gran-canaria.jpg",
+        "https://www.klosterhof.de/_Resources/Persistent/6985d76f35063ff61c45c3ed21e252c34e176500/klosterhof-aussenansicht-nacht-terasse-neubau-1920x1000.jpg",
+        "https://www.umweltzeichen-hotels.at/wp-content/uploads/2023/12/103-0861-LR_kirchheimerhof_look%C2%A9gert_perauer.jpg"
+        ],
       plugins: plugins,
     };
-  },
+  }
 };
 </script>
 
@@ -51,11 +49,11 @@ img {
   height: 20em;
   margin: 0 1px;
   object-fit: cover;
-  min-width: 20vw;
+  width: 30vw;
 }
 
 .card-panel {
-  width: 20vw;
+  width: 30vw;
 }
 
 /* body {

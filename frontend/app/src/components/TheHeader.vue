@@ -12,27 +12,27 @@
           center center / cover no-repeat;
     "
   >
-      <v-row no-gutters  align="center" justify="center">
-        <v-col>
-          <v-row no-gutters class="mt-2">
-            <v-col cols="4" class="text-center">
-              <p class="text-h5">H O T E L S</p>
-            </v-col>
-          </v-row>
-          <v-row no-gutters class="mb-2">
-            <v-col cols="4" class="text-center">
-              <p class="mx-3">
-                <v-icon>mdi-star</v-icon><v-icon>mdi-star</v-icon
-                ><v-icon>mdi-star</v-icon><v-icon>mdi-star</v-icon
-                ><v-icon>mdi-star</v-icon><v-icon>mdi-star</v-icon>
-              </p>
-            </v-col>
-          </v-row>
-        </v-col>
-        <v-col>
-          <the-navigation-bar />
-        </v-col>
-      </v-row>
+    <v-row no-gutters align="center" justify="center">
+      <v-col @click="goToStart" style="cursor: pointer">
+        <v-row no-gutters class="mt-2">
+          <v-col cols="4" class="text-center">
+            <p class="text-h5">H O T E L S</p>
+          </v-col>
+        </v-row>
+        <v-row no-gutters class="mb-2">
+          <v-col cols="4" class="text-center">
+            <p class="mx-3">
+              <v-icon>mdi-star</v-icon><v-icon>mdi-star</v-icon
+              ><v-icon>mdi-star</v-icon><v-icon>mdi-star</v-icon
+              ><v-icon>mdi-star</v-icon><v-icon>mdi-star</v-icon>
+            </p>
+          </v-col>
+        </v-row>
+      </v-col>
+      <v-col>
+        <the-navigation-bar />
+      </v-col>
+    </v-row>
   </v-app-bar>
 </template>
 
@@ -41,6 +41,11 @@ import TheNavigationBar from "./TheNavigationBar.vue";
 export default {
   components: { TheNavigationBar },
   name: "the-header",
+  methods: {
+    goToStart() {
+      this.$router.push({ path: "/" });
+    },
+  },
 };
 </script>
 <style>

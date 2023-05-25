@@ -7,12 +7,15 @@
 </template>
 
 <script>
-
 export default {
-  name: 'App',
+  name: "App",
 
   data: () => ({
     //
   }),
-}
+
+  created() {
+    document.title = "SIX STAR HOTELS";
+  },
+};
 </script>

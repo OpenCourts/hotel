@@ -2,11 +2,11 @@
   <v-card
     :style="`background: linear-gradient(
       to right,
-      rgba(30, 30, 30, 1),
-      rgba(30, 30, 30, 1),
-      rgba(30, 30, 30, 1),
-      rgba(30, 30, 30, 0.8),
-      rgba(30, 30, 30, 0)
+      rgba(${bgCol}, ${bgCol / 3 + 20}, 30, 1),
+      rgba(${bgCol}, ${bgCol / 3 + 20}, 30, 1),
+      rgba(${bgCol}, ${bgCol / 3 + 20}, 30, 1),
+      rgba(${bgCol}, ${bgCol / 3 + 20}, 30, 0.8),
+      rgba(${bgCol}, ${bgCol / 3 + 20}, 30, 0)
     ),
     url(${imageUrl})
       center center / cover no-repeat;
@@ -62,6 +62,14 @@
           </v-label>
         </v-col>
       </v-row>
+      <v-row>
+        <v-col>
+          <v-label :style="`color: ${availabeRoomsTextColor}`"
+            ><v-icon class="mr-2">{{ availabeRoomsIcon }}</v-icon
+            >{{ availableRoomsText }}</v-label
+          >
+        </v-col>
+      </v-row>
       <div style="position: absolute; top: 0; right: 0">
         <v-col>
           <v-chip
@@ -89,6 +97,11 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      warningLimit: 1,
+    };
+  },
   computed: {
     ...mapGetters("roomType", ["dateRange"]),
     imageUrl() {
@@ -99,6 +112,34 @@ export default {
     },
     priceTotal() {
       return this.roomType.pricePerNight * this.dateRange;
+    },
+    availableRoomsText() {
+      if (this.roomType.availableRooms == 0) {
+        return "No more rooms available for your selected period";
+      }
+      return `${
+        this.roomType.availableRooms <= this.warningLimit ? "Only" : ""
+      } ${this.roomType.availableRooms} room${
+        this.roomType.availableRooms == 1 ? "" : "s"
+      } vailable for your selected period`;
+    },
+    availabeRoomsTextColor() {
+      if (this.roomType.availableRooms == 0) return "red";
+      return this.roomType.availableRooms <= this.warningLimit
+        ? "orange"
+        : "inherit";
+    },
+    availabeRoomsIcon() {
+      if (this.roomType.availableRooms == 0) return "mdi-cross";
+      return this.roomType.availableRooms <= this.warningLimit
+        ? "mdi-alert"
+        : "mdi-check";
+    },
+    bgCol() {
+      return this.roomType.availableRooms > 0 &&
+        this.roomType.availableRooms <= this.warningLimit
+        ? 45
+        : 30;
     },
   },
 };

@@ -1,6 +1,16 @@
 <template>
   <v-container v-if="filteredRoomTypes.length > 0">
-    <v-row v-for="roomType in filteredRoomTypes" :key="roomType.id">
+    <v-row v-if="availableRoomTypes.length > 0">
+      <v-col>
+        <p class="text-h5">
+          {{ availableRoomTypes.length }} room type{{
+            availableRoomTypes.length == 1 ? "" : "s"
+          }}
+          available
+        </p>
+      </v-col>
+    </v-row>
+    <v-row v-for="roomType in availableRoomTypes" :key="roomType.id">
       <v-col>
         <v-hover>
           <template v-slot:default="{ isHovering, props }">
@@ -31,17 +41,27 @@
         </v-hover>
       </v-col>
     </v-row>
+    <v-row v-if="unavailableRoomTypes.length > 0">
+      <v-col>
+        <p class="text-h5">Unavailable room types</p>
+      </v-col>
+    </v-row>
+    <v-row v-for="roomType in unavailableRoomTypes" :key="roomType.id">
+      <v-col>
+        <room-type-result :roomType="roomType" disabled> </room-type-result>
+      </v-col>
+    </v-row>
   </v-container>
   <v-container v-else class="fill-height">
     <v-row justify="center" align="center">
       <v-col class="text-center">
         <p class="mb-2">
-          <v-icon size="15vh" style="opacity: 0.3"
+          <v-icon size="10vh" style="opacity: 0.3"
             >mdi-emoticon-sad-outline</v-icon
           >
         </p>
-        <v-label style="font-size: 2.5vh"
-          >Sorry, there are no rooms that match your search criteria</v-label
+        <v-label style="font-size: 2vh"
+          >Sorry, there are no available rooms that match your search criteria</v-label
         >
       </v-col>
     </v-row>
@@ -56,6 +76,12 @@ export default {
   name: "result-list",
   computed: {
     ...mapGetters("roomType", ["filteredRoomTypes"]),
+    availableRoomTypes() {
+      return this.filteredRoomTypes.filter((rt) => rt.availableRooms > 0);
+    },
+    unavailableRoomTypes() {
+      return this.filteredRoomTypes.filter((rt) => rt.availableRooms == 0);
+    },
   },
   methods: {
     ...mapMutations("booking", ["setBookingInformation"]),

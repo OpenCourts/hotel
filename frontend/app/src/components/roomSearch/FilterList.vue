@@ -2,15 +2,33 @@
   <v-container>
     <v-card>
       <v-list>
-        <v-label class="ml-4 my-2 text-h6"> Price Range</v-label>
+        <v-label class="ml-4 py-2 text-h6"> Price Range</v-label>
         <v-list-item>
-          <v-text-field label="min. price" variant="outlined" />
+          <v-text-field
+            v-model.number="minPrice"
+            placeholder="price per night"
+            variant="outlined"
+            prepend-inner-icon="mdi-currency-eur"
+            @keypress.enter="setMinPrice"
+            @blur="setMinPrice"
+            ><template #prepend><label>from</label></template></v-text-field
+          >
         </v-list-item>
         <v-list-item>
-          <v-text-field label="max. price" variant="outlined" />
+          <v-text-field
+            v-model.number="maxPrice"
+            placeholder="price per night"
+            variant="outlined"
+            prepend-inner-icon="mdi-currency-eur"
+            @keypress.enter="setMaxPrice"
+            @blur="setMaxPrice"
+            ><template #prepend><label>to</label></template></v-text-field
+          >
         </v-list-item>
         <v-divider v-if="availableFilters?.length > 1" />
-        <v-label class="ml-4 my-2 text-h6" v-if="availableFilters?.length > 1"> Amenities </v-label>
+        <v-label class="ml-4 my-2 text-h6" v-if="availableFilters?.length > 1">
+          Amenities
+        </v-label>
         <v-list-item v-for="filter in availableFilters" :key="filter">
           <v-switch
             v-model="amenitiesFilters"
@@ -38,6 +56,8 @@ export default {
   data() {
     return {
       amenitiesFilters: [],
+      maxPrice: null,
+      minPrice: null,
     };
   },
   computed: {
@@ -45,9 +65,15 @@ export default {
     ...mapState("roomType", ["activeAmenitiesFilters"]),
   },
   methods: {
-    ...mapMutations("roomType", ["setActiveAmenitiesFilters"]),
+    ...mapMutations("roomType", ["setActiveAmenitiesFilters", "setFilters"]),
     updateAmenitiesFilters() {
       this.setActiveAmenitiesFilters(this.amenitiesFilters);
+    },
+    setMinPrice() {
+      this.setFilters({ minPrice: this.minPrice });
+    },
+    setMaxPrice() {
+      this.setFilters({ maxPrice: this.maxPrice });
     },
   },
   created() {

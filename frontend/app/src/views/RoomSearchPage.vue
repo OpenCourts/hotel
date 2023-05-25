@@ -22,13 +22,16 @@
       </v-row>
       <v-row>
         <v-col cols="4"><filter-list /></v-col>
-        <v-col cols="8">
+        <v-col cols="8" class="text-center">
           <div
             :style="`opacity: ${
               hasClickedSearch && loadingRoomTypes ? 0.5 : 1
             }; transition: all .1s`"
           >
-            <base-spinner v-if="loadingRoomTypes && !hasClickedSearch" />
+            <base-spinner
+              class="mt-5"
+              v-if="loadingRoomTypes && !hasClickedSearch"
+            />
             <result-list
               v-else-if="hasClickedSearch || roomTypes.length > 0"
             /></div
