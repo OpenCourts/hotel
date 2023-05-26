@@ -287,71 +287,60 @@ pub async fn create_guest_booking(guest_ids: &[i32], booking_id: i32, conn: &Db)
 }
 
 #[post("/booking", data="<booking>")]
-pub async fn post_booking(booking: Json<Booking>, conn: &State<Db>) -> Result<String, Status> {
+pub async fn post_booking(booking: Json<Booking>, conn: &State<Db>) -> (Status, String) {
     let loc_booking = booking.into_inner();
     let check = check_room_availability(&loc_booking.check_in_date.as_str(), &loc_booking.check_out_date.as_str(), loc_booking.room_type_id as i32, loc_booking.hotel_id as i32, &conn)
-        .await;
+        .await
+        .unwrap();
     let mut return_id: i32 = -1;
     let mut return_status = Status::InternalServerError;
-    let mut return_msg = String::new();
-    match check {
-        Ok(val) => {if val {
-            let guest_ids = create_guests(loc_booking.guests.deref() , &conn)
-                .await;
-            match guest_ids{
-                Ok(vec_ids) => {
-                    println!("derefed first element of guest vec: {}", *vec_ids.index(0));
-                    let creation = create_booking(&loc_booking, *vec_ids.index(0), &conn).await;
+    let mut return_msg= String::new();
+    if check {
+        let guest_ids = create_guests(loc_booking.guests.deref(), &conn)
+            .await;
+        match guest_ids {
+            Ok(vec_ids) => {
+                println!("derefed first element of guest vec: {}", *vec_ids.index(0));
+                let creation = create_booking(&loc_booking, *vec_ids.index(0), &conn).await;
 
-                    match creation {
-                        Ok(booking_struct) => {
-                            let result = create_guest_booking(&vec_ids, booking_struct.booking_id, &conn)
-                                .await;
-                            match result{
-                                Ok(still_booking_id) => {
-                                    let begin_date = NaiveDate::parse_from_str(loc_booking.check_in_date.as_str(), "%Y-%m-%d").unwrap();
-                                    let end_date  = NaiveDate::parse_from_str(loc_booking.check_out_date.as_str(), "%Y-%m-%d").unwrap();
-                                    let day_diff = end_date.day() as i32 - begin_date.day() as i32;
-                                    let price = calc_total_price(loc_booking.room_type_id, loc_booking.check_in_date.as_str(), loc_booking.check_out_date.as_str(), &conn)
-                                        .await?;
-                                    let mut context = Context::new();
-                                    context.insert("recipient", loc_booking.guests.deref().index(0).name.as_str());
-                                    context.insert("booking_id", format!("{}", booking_struct.booking_id).as_str());
-                                    context.insert("room_number", format!("{}", booking_struct.room_number).as_str());
-                                    context.insert("booking_date", loc_booking.check_in_date.as_str());
-                                    context.insert("booking_duration", format!("{} Day(s)", day_diff).as_str());
-                                    context.insert("booking_amount", format!("{} Monetos", price).as_str());
-                                    mailer::send_email(loc_booking.guests.deref().index(0).email.as_str(),"Your Booking at Six Star hotel", "booking.html", context)
-                                        .await.expect("PANIC!!!");
-                                    /*atch mailres {
-                                        Ok(smh) => {
-                                            println!("Mail ist raus");
-                                            Ok(())
-                                        },
-                                        Err(val)=>{
-                                            error!("{}",val);
-                                            Err(Status::ImATeapot)
-                                        }
-                                    };*/
-                                    //return_id = still_booking_id
-                                },
-                                Err(err_stat)  => return_status = err_stat
-                            }
-                            return_id = booking_struct.booking_id
-                        },
-                        Err(err_stat) => return_status = err_stat
-                    }
-                },
-                Err(err_stat) => return_status = err_stat
-            }
-            return_msg = format!("Created Bocking with id {}", return_id)
-        } else {
-            return_msg.push_str("Room no longer available, please try again later");
-            return_status = Status::Conflict;
+                match creation {
+                    Ok(booking_struct) => {
+                        let result = create_guest_booking(&vec_ids, booking_struct.booking_id, &conn)
+                            .await;
+                        match result {
+                            Ok(still_booking_id) => {
+                                let begin_date = NaiveDate::parse_from_str(loc_booking.check_in_date.as_str(), "%Y-%m-%d").unwrap();
+                                let end_date = NaiveDate::parse_from_str(loc_booking.check_out_date.as_str(), "%Y-%m-%d").unwrap();
+                                let day_diff = end_date.day() as i32 - begin_date.day() as i32;
+                                let price = calc_total_price(loc_booking.room_type_id, loc_booking.check_in_date.as_str(), loc_booking.check_out_date.as_str(), &conn)
+                                    .await
+                                    .unwrap();
+                                let mut context = Context::new();
+                                context.insert("recipient", loc_booking.guests.deref().index(0).name.as_str());
+                                context.insert("booking_id", format!("{}", booking_struct.booking_id).as_str());
+                                context.insert("room_number", format!("{}", booking_struct.room_number).as_str());
+                                context.insert("booking_date", loc_booking.check_in_date.as_str());
+                                context.insert("booking_duration", format!("{} Day(s)", day_diff).as_str());
+                                context.insert("booking_amount", format!("{} Monetos", price).as_str());
+                                mailer::send_email(loc_booking.guests.deref().index(0).email.as_str(), "Your Booking at Six Star hotel", "booking.html", context)
+                                    .await.expect("PANIC!!!");
+                            },
+                            Err(err_stat) => return_status = err_stat
+                        }
+                        return_id = booking_struct.booking_id
+                    },
+                    Err(err_stat) => return_status = err_stat
+                }
+            },
+            Err(err_stat) => return_status = err_stat
         }
-        Ok(return_msg)},
-        Err(smh) => Err(return_status)
+        return_msg = format!("Created Booking with id: {}", return_id);
+        return_status = Status::Ok
+    } else {
+        return_msg.push_str("Room no longer available, please try again later");
+        return_status = Status::Conflict
     }
+    (return_status, return_msg)
 }
 
 pub async fn get_max_id_off_table(table_name: &str, conn: &Db) -> Result<i32, Status>{
