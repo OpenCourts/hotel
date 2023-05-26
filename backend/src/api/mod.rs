@@ -9,7 +9,8 @@ pub fn build_api(rc: Rocket<Build>, base: &str) -> Rocket<Build> {
         handler::get_hotels,
         handler::get_hotel,
         handler::get_room_types,
-        handler::get_carousel
+        handler::get_carousel,
+        handler::post_booking
         ],
     )
 }

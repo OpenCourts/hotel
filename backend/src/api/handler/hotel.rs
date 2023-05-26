@@ -1,5 +1,5 @@
 use std::{fs, result};
-use std::ops::Deref;
+use std::ops::{Deref, Index};
 use std::path::{PathBuf};
 use rocket::http::Status;
 use rocket::response::status::Custom;
@@ -45,8 +45,13 @@ pub struct RoomType {
     room_available_count: i64
 }
 #[derive(FromRow, serde::Serialize)]
-pub struct QueryIntegerHelper{
+pub struct QueryInteger64Helper{
     value: i64
+}
+
+#[derive(FromRow, serde::Serialize)]
+pub struct QueryInteger32Helper{
+    value: i32
 }
 
 #[derive(Debug, serde::Serialize)]
@@ -183,8 +188,8 @@ pub async fn get_room_types(from_date: &str, to_date: &str, price_upper: Option<
 // }
 
 pub async fn check_room_availability(from_date: &str, to_date: &str, room_type_id: i32, hotel_id: i32, conn: &Db) -> Result<bool,Status> {
-    let result = sqlx::query_as::<_, QueryIntegerHelper>("select count(*) from rooms r2 where r2.id not in (select b.room_id from bookings b where (b.check_in_date, b.check_out_date) overlaps ($1::DATE, $2::DATE))
-                                                                            and hotel_id = $3 and room_type_id = $4) as room_available_count")
+    let result = sqlx::query_as::<_, QueryInteger64Helper>("select count(*) as value from rooms r2 where r2.id not in (select b.room_id from bookings b where (b.check_in_date, b.check_out_date) overlaps ($1::DATE, $2::DATE))
+                                                                            and hotel_id = $3 and room_type_id = $4")
         .bind(from_date)
         .bind(to_date)
         .bind(hotel_id)
@@ -200,19 +205,20 @@ pub async fn check_room_availability(from_date: &str, to_date: &str, room_type_i
     }
 }
 
-pub async fn create_guests(guests: Vec<Guest>, mut conn: &Db) -> Result<Vec<i64>, Status>{
+pub async fn create_guests(guests: &[Guest], mut conn: &Db) -> Result<Vec<i32>, Status>{
     let mut query_string = String::new();
     for guest in guests {
-        query_string.push_str(format!("insert into guests (guest_name, guest_email, guest_phone_number, guest_address, guest_passport_number) values ({:?}, {:?}, {:?}, {:?}, {:?});", guest.name, guest.email, guest.phone_number, guest.address, guest.passport_number).as_str());
+        query_string.push_str(format!("insert into guests (guest_name, guest_email, guest_phone_number, guest_address, guest_passport_number) values ('{}', '{}', '{}', '{}', '{}');", guest.name, guest.email, guest.phone_number, guest.address, guest.passport_number).as_str());
     }
     let result = sqlx::query(query_string.as_str())
         .execute(&**conn)
         .await;
     match result {
         Ok(val) => {
-            let mut return_vec: Vec<i64> = Vec::new();
+            let mut return_vec: Vec<i32> = Vec::new();
             let guests_old_max_id = get_max_id_off_table("guests", conn).await.unwrap();
-            for i in guests_old_max_id+1..guests_old_max_id+1+val.rows_affected() as i64 {
+            for i in guests_old_max_id..guests_old_max_id+val.rows_affected() as i32 {
+                println!("Guestvec hinzugefügt: {}", i);
                 return_vec.push(i)
             }
             Ok(return_vec)
@@ -224,16 +230,17 @@ pub async fn create_guests(guests: Vec<Guest>, mut conn: &Db) -> Result<Vec<i64>
     }
 }
 
-pub async fn create_booking(mut booking: Json<Booking>, main_guest_id: i64, conn: &Db) -> Result<i64, Status>{
+pub async fn create_booking(booking: &Booking,main_guest_id: i32, conn: &Db) -> Result<i32, Status>{
+    println!("in create_booking");
     let total_price = calc_total_price(booking.room_type_id, booking.check_in_date.as_str(), booking.check_out_date.as_str(), conn).await.unwrap();
 
-    let result = sqlx::query(format!("Insert into bookings (room_id, guest_id, check_in_date, check_out_date, total_price) values ( {}, {}, {}::DATE, {}::DATE, {})", get_next_free_room(booking.hotel_id, booking.room_type_id, booking.check_in_date.as_str(), booking.check_out_date.as_str(), conn).await.unwrap(), main_guest_id, booking.check_in_date, booking.check_out_date, total_price).as_str())
+    let result = sqlx::query(format!("Insert into bookings (room_id, guest_id, check_in_date, check_out_date, total_price) values ( {}, {}, '{}'::DATE, '{}'::DATE, {})", get_next_free_room(booking.hotel_id, booking.room_type_id, booking.check_in_date.as_str(), booking.check_out_date.as_str(), conn).await.unwrap(), main_guest_id, booking.check_in_date, booking.check_out_date, total_price).as_str())
         .execute(&**conn)
         .await;
     match result {
         Ok(val) => {
             let bookings_old_max_id = get_max_id_off_table("bookings", conn).await.unwrap();
-            Ok(bookings_old_max_id + 1)
+            Ok(bookings_old_max_id)
         }
         Err(error) => {
             error!("Something went wrong: {}", error);
@@ -242,29 +249,66 @@ pub async fn create_booking(mut booking: Json<Booking>, main_guest_id: i64, conn
     }
 }
 
-#[get("/hotels/<id>", data="<booking>")]
-pub async fn get_test(booking: Json<Booking>, id: i64, conn: &State<Db>) -> Result<Json<Hotel>, Status> {
-    create_booking(booking, id, &conn);
-    let result = sqlx::query_as::<_, Hotel>("SELECT id, name, street, house_number, city, state, postal_code, country, phone_number, total_rooms FROM hotels WHERE id = $1")
-        .bind(id)
-        .fetch_one(&***conn)
+pub async fn create_guest_booking(guest_ids: &[i32], booking_id: i32, conn: &Db) -> Result<i32, Status>{
+    println!("in create_guest_booking");
+    let mut query_string = String::new();
+    for id in guest_ids {
+        query_string.push_str(format!("insert into guests_bookings (guest_id, booking_id) values ({}, {});", *id, booking_id).as_str());
+    }
+    let result = sqlx::query(query_string.as_str())
+        .execute(&**conn)
         .await;
-
     match result {
-        Ok(hotel) => Ok(Json(hotel)),
+        Ok(val) => Ok(booking_id),
+
         Err(error) => {
-            error!("Failed to fetch hotel {}: {:?}", id, error);
-            match error {
-                Error::RowNotFound => Err(Status::NotFound),
-                _ => Err(Status::InternalServerError),
-            }
+            error!("Something went wrong: {}", error);
+            Err(Status::InternalServerError)
         }
     }
 }
 
-pub async fn get_max_id_off_table(table_name: &str, conn: &Db) -> Result<i64, Status>{
-    let result = sqlx::query_as::<_, QueryIntegerHelper>("Select max(id) from $1")
-        .bind(table_name)
+#[post("/booking", data="<booking>")]
+pub async fn post_booking(booking: Json<Booking>, conn: &State<Db>) -> Result<&str, Status> {
+    let loc_booking = booking.into_inner();
+    let check = check_room_availability(&loc_booking.check_in_date.as_str(), &loc_booking.check_out_date.as_str(), loc_booking.room_type_id as i32, loc_booking.hotel_id as i32, &conn)
+        .await;
+    let mut return_id: i32 = -1;
+    let mut return_status: Status;
+    match check {
+        Ok(val) => {if val {
+            let guest_ids = create_guests(loc_booking.guests.deref() , &conn)
+                .await;
+            match guest_ids{
+                Ok(vec_ids) => {
+                    println!("derefed first element of guest vec: {}", *vec_ids.index(0));
+                    let creation = create_booking(&loc_booking, *vec_ids.index(0), &conn).await;
+
+                    match creation {
+                        Ok(booking_id) => {
+                            let result = create_guest_booking(&vec_ids, booking_id, &conn)
+                                .await;
+                            match result{
+                                Ok(still_booking_id) => return_id = still_booking_id,
+                                Err(err_stat)  => return_status = err_stat
+                            }
+                            return_id = booking_id
+                        },
+                        Err(err_stat) => return_status = err_stat
+                    }
+                },
+                Err(err_stat) => return_status = err_stat
+            }
+        }
+
+        Ok("Success")},
+        Err(error) => Err(error)
+    }
+}
+
+pub async fn get_max_id_off_table(table_name: &str, conn: &Db) -> Result<i32, Status>{
+    println!("in max_id_off_table");
+    let result = sqlx::query_as::<_, QueryInteger32Helper>(format!("Select max(id) as value from {}", table_name).as_str())
         .fetch_one(&**conn)
         .await;
     match result {
@@ -276,11 +320,12 @@ pub async fn get_max_id_off_table(table_name: &str, conn: &Db) -> Result<i64, St
     }
 }
 
-pub async fn get_next_free_room(hotel_id: i64, room_type_id: i64, from_date: &str, to_date: &str, conn: &Db) -> Result<i64, Status>{
-    let result = sqlx::query_as::<_, QueryIntegerHelper>("\
-        select min(id) from rooms r2 \
+pub async fn get_next_free_room(hotel_id: i64, room_type_id: i64, from_date: &str, to_date: &str, conn: &Db) -> Result<i32, Status>{
+    println!(" in next_free_room");
+    let result = sqlx::query_as::<_, QueryInteger32Helper>("\
+        select min(id) as value from rooms r2 \
         where r2.id not in (select b.room_id from bookings b where (b.check_in_date, b.check_out_date) overlaps ($1::DATE, $2::DATE))
-        and hotel_id = $3 and room_type_id = $4) as room_available_count")
+        and hotel_id = $3 and room_type_id = $4 ")
         .bind(from_date)
         .bind(to_date)
         .bind(hotel_id)
@@ -288,7 +333,9 @@ pub async fn get_next_free_room(hotel_id: i64, room_type_id: i64, from_date: &st
         .fetch_one(&**conn)
         .await;
     match result {
-        Ok(val) => Ok(val.value),
+        Ok(val) => {
+            println!("Id of next free room: {}", val.value);
+            Ok(val.value)},
         Err(error) => {
             error!("Something went wrong: {}", error);
             Err(Status::InternalServerError)
@@ -296,9 +343,10 @@ pub async fn get_next_free_room(hotel_id: i64, room_type_id: i64, from_date: &st
     }
 }
 
-pub async fn calc_total_price(room_type_id: i64, from_date: &str, to_date: &str, conn: &Db) -> Result<i64, Status>{
-    let result = sqlx::query_as::<_, QueryIntegerHelper>("\
-        select prize_per_night from room_types  \
+pub async fn calc_total_price(room_type_id: i64, from_date: &str, to_date: &str, conn: &Db) -> Result<i32, Status>{
+    println!("in calc_total");
+    let result = sqlx::query_as::<_, QueryInteger32Helper>("\
+        select price_per_night as value from room_types  \
         where id = $1")
         .bind(room_type_id)
         .fetch_one(&**conn)
@@ -307,7 +355,7 @@ pub async fn calc_total_price(room_type_id: i64, from_date: &str, to_date: &str,
         Ok(val) => {
             let begin_date = NaiveDate::parse_from_str(from_date, "%Y-%m-%d").unwrap();
             let end_date  = NaiveDate::parse_from_str(to_date, "%Y-%m-%d").unwrap();
-            let day_diff = (begin_date.day() as i64 - end_date.day() as i64);
+            let day_diff = (end_date.day() as i32 - begin_date.day() as i32);
             Ok(val.value * day_diff)
         }
         Err(error) => {
