@@ -1,7 +1,9 @@
 <template>
   <Flicking :options="{ circular: true }" :plugins="plugins">
     <div class="card-panel" v-for="(image, i) in images" :key="i">
-      <img :src="image" draggable="false" />
+      <div class="img-wrapper">
+        <img class="img" :src="image" draggable="false" />
+      </div>
     </div>
   </Flicking>
 </template>
@@ -20,7 +22,7 @@ const plugins = [
     stopOnHover: false,
     delayAfterHover: true,
   }),
-  new Fade()
+  new Fade(),
 ];
 
 export default {
@@ -36,23 +38,28 @@ export default {
         "https://cf.bstatic.com/xdata/images/xphoto/540x405/12097111.jpg?k=ab8d257011c475ed67db40f6ad3dc6339a0ca882f606e5585365ab16411b00d1&o=",
         "https://www.lopesan.com/img/hotels/5867/600-1000-imagen-emblematica-hotel-corallium-beach-by-lopesan-hotels-san-agustin-gran-canaria.jpg",
         "https://www.klosterhof.de/_Resources/Persistent/6985d76f35063ff61c45c3ed21e252c34e176500/klosterhof-aussenansicht-nacht-terasse-neubau-1920x1000.jpg",
-        "https://www.umweltzeichen-hotels.at/wp-content/uploads/2023/12/103-0861-LR_kirchheimerhof_look%C2%A9gert_perauer.jpg"
-        ],
+        "https://www.umweltzeichen-hotels.at/wp-content/uploads/2023/12/103-0861-LR_kirchheimerhof_look%C2%A9gert_perauer.jpg",
+      ],
       plugins: plugins,
     };
-  }
+  },
 };
 </script>
 
 <style scoped>
-img {
+.img-wrapper img {
   height: 20em;
   margin: 0 1px;
   object-fit: cover;
   width: 30vw;
 }
 
+.img {
+  transform: skewX(10deg) !important;
+}
+
 .card-panel {
+  transform: skewX(-10deg) !important;
   width: 30vw;
 }
 

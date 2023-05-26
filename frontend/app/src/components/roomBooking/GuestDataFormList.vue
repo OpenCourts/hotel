@@ -5,7 +5,20 @@
       :key="i"
     >
       <v-expansion-panel-title :style="`background-color: ${getColor(i)}`"
-        ><v-icon class="mr-3">{{ getIcon(i) }}</v-icon> {{ getName(i) }}
+        ><v-icon class="my-1 mr-3">{{ getIcon(i) }}</v-icon> {{ getName(i)
+        }}<v-btn v-if="i == 0"
+          icon
+          plain
+          fab
+          elevation="0"
+          :ripple="false"
+          color="transparent"
+          class="ml-1"
+          ><v-tooltip activator="parent" location="end"
+            >This guest is the main guest and will receive a booking
+            confirmation.</v-tooltip
+          ><v-icon>mdi-crown </v-icon>
+        </v-btn>
       </v-expansion-panel-title>
       <v-expansion-panel-text>
         <guest-data-form
@@ -61,6 +74,3 @@ export default {
   },
 };
 </script>
-
-<style>
-</style>

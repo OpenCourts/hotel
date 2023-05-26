@@ -28,7 +28,7 @@
         </v-col>
       </v-row>
       <v-row>
-        <p class="text-center paragraph">
+        <p class="text-justify paragraph">
           Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
           nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat,
           sed diam voluptua. At vero eos et accusam et justo duo dolores et ea
@@ -44,11 +44,11 @@
       </v-row>
       <v-row>
         <v-col class="text-center my-4">
-          <v-btn :to="{ name: 'roomSearch' }" size="x-large">Book now! </v-btn>
+          <v-btn color="#862" :to="{ name: 'roomSearch' }" size="x-large">Book now! </v-btn>
         </v-col>
       </v-row>
       <v-row>
-        <p class="text-center paragraph">
+        <p class="text-justify paragraph">
           At vero eos et accusam et justo duo dolores et ea rebum. Stet clita
           kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit
           amet. Duis autem vel eum iriure dolor in hendrerit in vulputate velit
