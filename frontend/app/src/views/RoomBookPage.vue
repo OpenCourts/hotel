@@ -115,13 +115,7 @@
             </v-row>
             <v-row>
               <v-col class="text-center">
-                <v-btn
-                  :to="bookingSuccessful ? { path: '/' } : null"
-                  color="#333"
-                  @click="close"
-                >
-                  Close
-                </v-btn>
+                <v-btn color="#333" @click="close"> Close </v-btn>
               </v-col>
             </v-row>
           </v-container>
@@ -149,7 +143,7 @@ export default {
     return {
       isBooking: false,
       bookingSuccessful: false,
-      bookingFailed: true,
+      bookingFailed: false,
       bookingIsLoading: false,
     };
   },
@@ -175,7 +169,10 @@ export default {
     },
   },
   methods: {
-    ...mapMutations("booking", ["setBookingInformation", "clearBookingInformation"]),
+    ...mapMutations("booking", [
+      "setBookingInformation",
+      "clearBookingInformation",
+    ]),
     ...mapActions("booking", ["submitBooking"]),
     async book() {
       this.isBooking = true;
@@ -184,7 +181,7 @@ export default {
         await this.submitBooking();
         this.bookingSuccessful = true;
       } catch (e) {
-        console.error(e)
+        console.error(e);
         this.bookingSuccessful = false;
         this.bookingFailed = true;
       } finally {
@@ -192,13 +189,14 @@ export default {
       }
     },
     close() {
-      this.isBooking = false
+      this.isBooking = false;
       if (this.bookingSuccessful) {
-        this.clearBookingInformation()
+        this.clearBookingInformation();
+        this.$router.push({ name: "welcome" });
       }
-      this.bookingSuccessful = false
-      this.bookingFailed = false
-    }
+      this.bookingSuccessful = false;
+      this.bookingFailed = false;
+    },
   },
   created() {
     this.setBookingInformation({

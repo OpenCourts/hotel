@@ -138,7 +138,7 @@ export default {
         isPassportNumber: (value) =>
           !value ||
           /^(?!^0+$)[a-zA-Z0-9]{3,20}$/.test(value) ||
-          "Phone number is invalid",
+          "Passport number is invalid",
       },
     };
   },

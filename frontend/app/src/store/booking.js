@@ -1,4 +1,4 @@
-import { makeJsonRequest } from "@/helpers/requestHelper"
+
 
 const bookingModule = {
     namespaced: true,
@@ -47,7 +47,7 @@ const bookingModule = {
                 hotel_id: state.hotelId
             }
             console.log(request)
-            const response = makeJsonRequest("/booking", "POST", request);
+            const response = await fetch(process.env.VUE_APP_HOTELS_API_LOCATION + "/booking", { method: "POST", body: JSON.stringify(request) })
             console.log(response)
         }
     }

@@ -13,7 +13,7 @@ export function getQueryString(queryObject) {
 }
 
 /**
- * Makes an authenticated request to the OpenCourts API using fetch()
+ * Makes a request to the Hotels API using fetch()
  * @param {String} path             The Location of the endpoint or the Ressource which is to fetch
  * @param {String} method           The HTTP method ([GET], POST, PUT, DELETE)
  * @param {Object} headers          Additional headers to Authorization and Content-Type
@@ -42,6 +42,7 @@ async function getResponse(path, method, headers, body) {
     const requestOptions = { method: method, headers: headers }
     if (body) { requestOptions['body'] = JSON.stringify(body) }
 
+    console.log(requestOptions)
     let response = await fetch(process.env.VUE_APP_HOTELS_API_LOCATION + path, requestOptions);
 
     if (!response.ok) { throw new Error(response.statusText) }
