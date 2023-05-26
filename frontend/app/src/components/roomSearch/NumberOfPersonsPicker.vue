@@ -8,7 +8,11 @@
     <template #prepend-inner>
       <v-icon class="mr-2"> mdi-account-multiple </v-icon>
     </template>
-    <v-menu activator="parent" :close-on-content-click="false">
+    <v-menu
+      activator="parent"
+      :close-on-content-click="false"
+      @click:outside="updateGuests"
+    >
       <v-list>
         <v-list-item>
           <v-row justify="center" align="center">
@@ -59,13 +63,13 @@ export default {
       return `${this.valuePersons} person${this.valuePersons == 1 ? "" : "s"}`;
     },
   },
-  watch: {
-    valuePersons: {
-      handler: function () {
-        this.updateGuests();
-      },
-    },
-  },
+  // watch: {
+  //   valuePersons: {
+  //     handler: function () {
+  //       this.updateGuests();
+  //     },
+  //   },
+  // },
   methods: {
     ...mapMutations("roomType", ["setApiFilters"]),
     updateGuests() {
@@ -74,7 +78,7 @@ export default {
   },
   created() {
     this.valueAdults = this.apiFilters.guests ?? 1;
-    this.updateGuests()
+    this.updateGuests();
   },
 };
 </script>

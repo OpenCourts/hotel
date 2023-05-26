@@ -4,26 +4,21 @@
       <v-list>
         <v-label class="ml-4 py-2 text-h6"> Price Range</v-label>
         <v-list-item>
-          <v-text-field
-            v-model.number="minPrice"
-            placeholder="price per night"
-            variant="outlined"
-            prepend-inner-icon="mdi-currency-eur"
-            @keypress.enter="setMinPrice"
-            @blur="setMinPrice"
-            ><template #prepend><label>from</label></template></v-text-field
+          <v-range-slider
+            class="py-2 pr-4 mt-6"
+            strict
+            v-model="priceRange"
+            :min="10"
+            :max="500"
+            :step="10"
+            show-ticks="always"
+            :ticks="[]"
+            prepend-icon="mdi-currency-eur"
+            label="Price per night"
+            thumb-label="always"
+            @update:modelValue="setPrice"
           >
-        </v-list-item>
-        <v-list-item>
-          <v-text-field
-            v-model.number="maxPrice"
-            placeholder="price per night"
-            variant="outlined"
-            prepend-inner-icon="mdi-currency-eur"
-            @keypress.enter="setMaxPrice"
-            @blur="setMaxPrice"
-            ><template #prepend><label>to</label></template></v-text-field
-          >
+          </v-range-slider>
         </v-list-item>
         <v-divider v-if="availableFilters?.length > 1" />
         <v-label class="ml-4 my-2 text-h6" v-if="availableFilters?.length > 1">
@@ -58,6 +53,7 @@ export default {
       amenitiesFilters: [],
       maxPrice: null,
       minPrice: null,
+      priceRange: [10, 500],
     };
   },
   computed: {
@@ -69,11 +65,8 @@ export default {
     updateAmenitiesFilters() {
       this.setActiveAmenitiesFilters(this.amenitiesFilters);
     },
-    setMinPrice() {
-      this.setFilters({ minPrice: this.minPrice });
-    },
-    setMaxPrice() {
-      this.setFilters({ maxPrice: this.maxPrice });
+    setPrice() {
+      this.setFilters({ minPrice: this.priceRange[0], maxPrice: this.priceRange[1] });
     },
   },
   created() {

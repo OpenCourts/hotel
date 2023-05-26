@@ -1,13 +1,25 @@
 <template>
-  <v-container v-if="filteredRoomTypes.length > 0">
+  <v-container>
+    <v-row>
+      <label class="text-h4 ml-3">{{ selectedHotel.name }}</label>
+    </v-row>
+    <v-row>
+      <time-range-overview />
+    </v-row>
+  </v-container>
+  <v-container
+    v-if="filteredRoomTypes.length > 0"
+    class="overflow-y-auto mb-5"
+    style="height: 60vh"
+  >
     <v-row v-if="availableRoomTypes.length > 0">
       <v-col>
-        <p class="text-h5">
+        <v-label>
           {{ availableRoomTypes.length }} room type{{
             availableRoomTypes.length == 1 ? "" : "s"
           }}
           available
-        </p>
+        </v-label>
       </v-col>
     </v-row>
     <v-row v-for="roomType in availableRoomTypes" :key="roomType.id">
@@ -41,11 +53,7 @@
         </v-hover>
       </v-col>
     </v-row>
-    <v-row v-if="unavailableRoomTypes.length > 0">
-      <v-col>
-        <p class="text-h5">Unavailable room types</p>
-      </v-col>
-    </v-row>
+    <v-divider class="my-8" v-if="unavailableRoomTypes.length > 0" />
     <v-row v-for="roomType in unavailableRoomTypes" :key="roomType.id">
       <v-col>
         <room-type-result :roomType="roomType" disabled> </room-type-result>
@@ -61,7 +69,8 @@
           >
         </p>
         <v-label style="font-size: 2vh"
-          >Sorry, there are no available rooms that match your search criteria</v-label
+          >Sorry, there are no available rooms that match your search
+          criteria</v-label
         >
       </v-col>
     </v-row>
@@ -70,12 +79,13 @@
 
 <script>
 import { mapGetters, mapMutations } from "vuex";
+import TimeRangeOverview from "../roomBooking/TimeRangeOverview.vue";
 import RoomTypeResult from "./RoomTypeResult.vue";
 export default {
-  components: { RoomTypeResult },
+  components: { RoomTypeResult, TimeRangeOverview },
   name: "result-list",
   computed: {
-    ...mapGetters("roomType", ["filteredRoomTypes"]),
+    ...mapGetters("roomType", ["filteredRoomTypes", "selectedHotel"]),
     availableRoomTypes() {
       return this.filteredRoomTypes.filter((rt) => rt.availableRooms > 0);
     },

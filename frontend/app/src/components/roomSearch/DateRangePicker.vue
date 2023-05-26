@@ -8,7 +8,7 @@
     :min-date="minDate"
     model-type="yyyy-MM-dd"
     auto-apply 
-    :close-on-auto-apply="false"
+    :close-on-auto-apply="true"
     disable-year-select 
     placeholder="When are you travelling?"
   />
