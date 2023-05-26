@@ -25,6 +25,13 @@ const bookingModule = {
             state.roomTypeId = bookingInformation.roomTypeId ?? state.roomTypeId
             state.hotelId = bookingInformation.hotelId ?? state.hotelId
         },
+        clearBookingInformation(state) {
+            state.startDate = null
+            state.endDate = null
+            state.guests = []
+            state.roomTypeId = null
+            state.hotelId = null
+        }
     },
 
     actions: {

@@ -26,13 +26,14 @@ const roomTypeModule = {
         nonAvailableTypes(state) {
             return state.roomTypes.filter(rt => !rt.isAvailable)
         },
-        availableFilters(state) {
-            if (!state.roomTypes) return []
-            const roomTypeAmenities = state.roomTypes.map(rt => rt.amenities).flat(1)
+        availableFilters(_, getters) {
+            if (!getters.filteredRoomTypes) return []
+            const roomTypeAmenities = getters.filteredRoomTypes.map(rt => rt.amenities).flat(1)
             return [...new Set(roomTypeAmenities)]
         },
         filteredRoomTypes(state) {
             return state.roomTypes.filter(rt => {
+                if (rt.roomCount == 0) return false
                 for (const activeFilter of state.activeAmenitiesFilters) {
                     if (!rt.amenities.includes(activeFilter)) { return false }
                 }
@@ -91,11 +92,12 @@ const roomTypeModule = {
             roomTypes.forEach((rt) => {
                 rt.pricePerNight = rt.price_per_night;
                 rt.amenities = rt.amenities.split(", ");
-                rt.availableRooms = rt.room_available_count ?? 2,
-                    rt.image = process.env.VUE_APP_HOTELS_SERVER_LOCATION + rt.image_url
+                rt.availableRooms = rt.room_available_count ?? 2;
+                rt.image = process.env.VUE_APP_HOTELS_SERVER_LOCATION + rt.image_url
+                rt.roomCount = rt.room_count
             })
             commit("setRoomTypes", roomTypes)
-        }
+        },
     }
 }
 

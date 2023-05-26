@@ -6,7 +6,8 @@
     >
       <v-expansion-panel-title :style="`background-color: ${getColor(i)}`"
         ><v-icon class="my-1 mr-3">{{ getIcon(i) }}</v-icon> {{ getName(i)
-        }}<v-btn v-if="i == 0"
+        }}<v-btn
+          v-if="i == 0"
           icon
           plain
           fab
@@ -46,6 +47,7 @@ export default {
   },
   computed: {
     ...mapState("roomType", ["apiFilters"]),
+    ...mapState("booking", ["guests"])
   },
   methods: {
     ...mapMutations("booking", ["setBookingInformation"]),
@@ -69,7 +71,7 @@ export default {
     },
   },
   created() {
-    this.guestData = [...Array(this.apiFilters.guests)];
+    this.guestData = this.guests
     this.valid = [...Array(this.apiFilters.guests)];
   },
 };

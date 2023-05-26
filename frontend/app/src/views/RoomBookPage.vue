@@ -144,7 +144,7 @@ export default {
       isBooking: false,
       bookingSuccessful: false,
       bookingFailed: false,
-      bookingIsLoading: false,
+      bookingIsLoading: false
     };
   },
   computed: {
@@ -198,6 +198,17 @@ export default {
       this.bookingFailed = false;
     },
   },
+  // beforeRouteLeave(_, _2, next) {
+  //   if (this.bookingSuccessful) return next();
+  //   const answer = window.confirm(
+  //     "Do you really want to cancel this booking?"
+  //   );
+  //   if (answer) {
+  //     next();
+  //   } else {
+  //     next(false);
+  //   }
+  // },
   created() {
     this.setBookingInformation({
       startDate: this.apiFilters.startDate,

@@ -98,6 +98,7 @@
 </template>
 
 <script>
+import { nextTick } from 'vue';
 export default {
   name: "guest-data-form",
   emits: ["input"],
@@ -182,13 +183,15 @@ export default {
         this.passportNumber = this.passportNumber.toUpperCase()
     }
   },
-  created() {
+  async created() {
     this.firstName = this.guestData?.firstName ?? this.firstName;
     this.lastName = this.guestData?.lastName ?? this.lastName;
     this.email = this.guestData?.email ?? this.email;
     this.address = this.guestData?.address ?? this.address;
-    this.phoneNumber = this.phoneNumber?.address ?? this.phoneNumber;
-    this.passportNumber = this.passportNumber?.address ?? this.passportNumber;
+    this.phoneNumber = this.guestData?.phoneNumber ?? this.phoneNumber;
+    this.passportNumber = this.guestData?.passportNumber ?? this.passportNumber;
+    await nextTick()
+    this.updateData()
   },
 };
 </script>
