@@ -6,6 +6,7 @@ use rocket::fs::FileServer;
 
 pub mod api;
 mod sqlx;
+mod mailer;
 
 
 /*#[catch(404)]
