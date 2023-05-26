@@ -18,16 +18,17 @@ const bookingModule = {
 
     mutations: {
         setBookingInformation(state, bookingInformation) {
-            state.startDate = bookingInformation.startDate ? bookingInformation.startDate : state.startDate
-            state.endDate = bookingInformation.endDate ? bookingInformation.endDate : state.endDate
-            state.guests = bookingInformation.guests ? bookingInformation.guests : state.guests
-            state.roomTypeId = bookingInformation.roomTypeId ? bookingInformation.roomTypeId : state.roomTypeId
+            state.startDate = bookingInformation.startDate ?? state.startDate
+            state.endDate = bookingInformation.endDate ?? state.endDate
+            state.guests = bookingInformation.guests ?? state.guests
+            state.roomTypeId = bookingInformation.roomTypeId ?? state.roomTypeId
+            state.hotelId = bookingInformation.hotelId ?? state.hotelId
         },
     },
 
     actions: {
-        async sendBooking() {
-            makeJsonRequest("/book", "POST");
+        async sendBooking(state) {
+            makeJsonRequest("/book", "POST", { from_date: state.startDate, end_date: state.endDate, guests: state.guests, room_type: state.roomTypeId });
         }
     }
 }

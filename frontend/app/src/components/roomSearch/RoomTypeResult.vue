@@ -9,8 +9,9 @@
       rgba(${bgCol}, ${bgCol / 3 + 20}, 30, 0)
     ),
     url(${imageUrl})
-      center center / cover no-repeat;
-    transition: all 0.1s;`"
+      right center / ${cover ? 'cover' : '65%'} no-repeat;
+    transition: all 0.1s;
+    border-radius: 10px`"
   >
     <slot name="overlay" />
     <v-container>
@@ -96,10 +97,15 @@ export default {
       type: Object,
       required: true,
     },
+    cover: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
-      warningLimit: 1,
+      warningLimit: 2,
     };
   },
   computed: {
@@ -115,13 +121,13 @@ export default {
     },
     availableRoomsText() {
       if (this.roomType.availableRooms == 0) {
-        return "No more rooms available for your selected period";
+        return "No more rooms left for your selected period";
       }
       return `${
         this.roomType.availableRooms <= this.warningLimit ? "Only" : ""
       } ${this.roomType.availableRooms} room${
         this.roomType.availableRooms == 1 ? "" : "s"
-      } vailable for your selected period`;
+      } left for your selected period`;
     },
     availabeRoomsTextColor() {
       if (this.roomType.availableRooms == 0) return "red";
@@ -130,7 +136,7 @@ export default {
         : "inherit";
     },
     availabeRoomsIcon() {
-      if (this.roomType.availableRooms == 0) return "mdi-cross";
+      if (this.roomType.availableRooms == 0) return "mdi-emoticon-confused";
       return this.roomType.availableRooms <= this.warningLimit
         ? "mdi-alert"
         : "mdi-check";

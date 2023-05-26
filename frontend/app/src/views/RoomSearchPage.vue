@@ -3,14 +3,12 @@
     <v-container v-if="!isLoading">
       <v-row>
         <v-col cols="4">
-          <hotel-picker :disabled="loadingRoomTypes" />
+          <hotel-picker />
         </v-col>
         <v-col cols="3">
-          <number-of-persons-picker :disabled="loadingRoomTypes" />
+          <number-of-persons-picker />
         </v-col>
-        <v-col cols="3">
-          <date-range-picker :disabled="loadingRoomTypes"
-        /></v-col>
+        <v-col cols="3"> <date-range-picker /></v-col>
         <v-col cols="2">
           <v-btn
             :disabled="!allApiFiltersSet || loadingRoomTypes"
@@ -22,7 +20,7 @@
       </v-row>
       <v-row>
         <v-col cols="4"><filter-list /></v-col>
-        <v-col cols="8" class="text-center">
+        <v-col cols="8">
           <div
             :style="`opacity: ${
               hasClickedSearch && loadingRoomTypes ? 0.5 : 1
@@ -83,6 +81,14 @@ export default {
       );
     },
   },
+  watch: {
+    apiFilters: {
+      deep: true,
+      async handler() {
+        await this.searchRoomTypes();
+      },
+    },
+  },
   methods: {
     ...mapActions("roomType", ["loadRoomTypes"]),
     ...mapActions("hotel", ["loadHotels"]),
@@ -97,6 +103,7 @@ export default {
       }
     },
     async searchRoomTypes() {
+      if (!this.allApiFiltersSet) return;
       this.loadingRoomTypes = true;
       try {
         await this.loadRoomTypes();

@@ -35,7 +35,12 @@ const roomTypeModule = {
             return state.roomTypes.filter(rt => {
                 for (const activeFilter of state.activeAmenitiesFilters) {
                     if (!rt.amenities.includes(activeFilter)) { return false }
-                    if (rt.pricePerNight > state.filters.maxPrice || rt.pricePerNight < state.filters.minPrice) { return false }
+                }
+                if (
+                    (state.filters.maxPrice && rt.pricePerNight > state.filters.maxPrice)
+                    || (state.filters.minPrice && rt.pricePerNight < state.filters.minPrice)
+                ) {
+                    return false
                 }
                 return true
             })
@@ -50,9 +55,10 @@ const roomTypeModule = {
         },
         dateRange(_, getters) {
             const diff = getters.endDate - getters.startDate
-            console.log(getters)
-            console.log(diff)
             return Math.ceil(diff / (1000 * 60 * 60 * 24));
+        },
+        selectedHotel(state, _, rootState) {
+            return rootState.hotel.hotels.find(h => h.id == state.apiFilters.hotelId)
         }
     },
 
@@ -85,7 +91,8 @@ const roomTypeModule = {
             roomTypes.forEach((rt) => {
                 rt.pricePerNight = rt.price_per_night;
                 rt.amenities = rt.amenities.split(", ");
-                rt.availableRooms = rt.room_available_count ?? 2
+                rt.availableRooms = rt.room_available_count ?? 2,
+                    rt.image = process.env.VUE_APP_HOTELS_SERVER_LOCATION + rt.image_url
             })
             commit("setRoomTypes", roomTypes)
         }
