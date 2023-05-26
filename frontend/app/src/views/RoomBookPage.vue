@@ -63,20 +63,76 @@
       <v-row>
         <v-col>
           <v-btn
+            @click="book"
             color="secondary"
             size="x-large"
             class="py-3 mb-10 mt-3 px-5"
             :disabled="guestDataMissing"
-            ><v-icon class="mr-3">mdi-home-edit-outline</v-icon>Book bindingly now</v-btn
+            ><v-icon class="mr-3">mdi-home-edit-outline</v-icon>Book bindingly
+            now</v-btn
           >
         </v-col>
       </v-row>
     </v-container>
+    <v-dialog v-model="isBooking" persistent width="40%" min-width="600px">
+      <v-card class="pa-4">
+        <v-card-title class="text-center">
+          <v-label class="text-h5">{{ progressTitle }}</v-label>
+        </v-card-title>
+        <v-card-text>
+          <v-container class="pt-0">
+            <v-row>
+              <v-progress-linear
+                model-value="100"
+                :indeterminate="bookingIsLoading"
+                :color="progressColor"
+              ></v-progress-linear>
+            </v-row>
+            <v-row class="mt-4">
+              <v-col>
+                <div v-if="bookingFailed">
+                  <p class="text-center">
+                    Something went wrong while processing your request. <br />
+                    Please try again in a few minutes.
+                  </p>
+                </div>
+                <div v-else-if="bookingSuccessful">
+                  <p class="text-center">
+                    Congratulations! <br />
+                    Your booking was successful. <br />
+                    You will shortly receive a booking confirmation via e-mail
+                    to
+                    <span style="color: orange"
+                      ><v-icon class="mr-1">mdi-email</v-icon
+                      >{{ guests[0]?.email ?? "blabla@gmail.com" }}</span
+                    >.<br />
+                    We're looking forward to welcoming you at
+                    <span style="color: orange">{{ selectedHotel.name }}</span
+                    >.
+                  </p>
+                </div>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col class="text-center">
+                <v-btn
+                  :to="bookingSuccessful ? { path: '/' } : null"
+                  color="#333"
+                  @click="close"
+                >
+                  Close
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </base-view>
 </template>
 
 <script>
-import { mapGetters, mapMutations, mapState } from "vuex";
+import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
 import BaseView from "../components/BaseView.vue";
 import GuestDataFormList from "../components/roomBooking/GuestDataFormList.vue";
 import TimeRangeOverview from "../components/roomBooking/TimeRangeOverview.vue";
@@ -89,6 +145,14 @@ export default {
     GuestDataFormList,
   },
   name: "room-book-page",
+  data() {
+    return {
+      isBooking: false,
+      bookingSuccessful: false,
+      bookingFailed: true,
+      bookingIsLoading: false,
+    };
+  },
   computed: {
     ...mapState("roomType", ["roomTypes", "apiFilters"]),
     ...mapState("booking", ["roomTypeId", "guests"]),
@@ -99,9 +163,42 @@ export default {
     guestDataMissing() {
       return this.guests.length != this.apiFilters.guests;
     },
+    progressColor() {
+      if (this.bookingFailed) return "red";
+      if (this.bookingSuccessful) return "green";
+      return "default";
+    },
+    progressTitle() {
+      if (this.bookingFailed) return "Booking failed";
+      if (this.bookingSuccessful) return "Booking successful";
+      return "Booking in progress...";
+    },
   },
   methods: {
-    ...mapMutations("booking", ["setBookingInformation"]),
+    ...mapMutations("booking", ["setBookingInformation", "clearBookingInformation"]),
+    ...mapActions("booking", ["submitBooking"]),
+    async book() {
+      this.isBooking = true;
+      this.bookingIsLoading = true;
+      try {
+        await this.submitBooking();
+        this.bookingSuccessful = true;
+      } catch (e) {
+        console.error(e)
+        this.bookingSuccessful = false;
+        this.bookingFailed = true;
+      } finally {
+        this.bookingIsLoading = false;
+      }
+    },
+    close() {
+      this.isBooking = false
+      if (this.bookingSuccessful) {
+        this.clearBookingInformation()
+      }
+      this.bookingSuccessful = false
+      this.bookingFailed = false
+    }
   },
   created() {
     this.setBookingInformation({

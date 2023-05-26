@@ -10,8 +10,7 @@
     ),
     url(${imageUrl})
       right center / ${cover ? 'cover' : '65%'} no-repeat;
-    transition: all 0.1s;
-    border-radius: 10px`"
+    transition: all 0.1s;`"
   >
     <slot name="overlay" />
     <v-container>
@@ -105,7 +104,7 @@ export default {
   },
   data() {
     return {
-      warningLimit: 2,
+      warningLimit: 1,
     };
   },
   computed: {

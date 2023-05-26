@@ -8,6 +8,7 @@ const bookingModule = {
         endDate: null,
         guests: [],
         roomTypeId: null,
+        hotelId: null
     },
 
     getters: {
@@ -27,8 +28,27 @@ const bookingModule = {
     },
 
     actions: {
-        async sendBooking(state) {
-            makeJsonRequest("/book", "POST", { from_date: state.startDate, end_date: state.endDate, guests: state.guests, room_type: state.roomTypeId });
+        async submitBooking({ state }) {
+            const guestsForRequest = []
+            for (const g of state.guests) {
+                guestsForRequest.push({
+                    name: `${g.firstName} ${g.lastName}`,
+                    email: g.email,
+                    phone_number: g.phoneNumber,
+                    address: g.address,
+                    passport_number: g.passportNumber
+                })
+            }
+            const request = {
+                guests: guestsForRequest,
+                room_type_id: state.roomTypeId,
+                check_in_date: state.startDate,
+                check_out_date: state.endDate,
+                hotel_id: state.hotelId
+            }
+            console.log(request)
+            const response = makeJsonRequest("/booking", "POST", request);
+            console.log(response)
         }
     }
 }

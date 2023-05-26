@@ -22,6 +22,13 @@
         </v-label>
       </v-col>
     </v-row>
+    <v-row v-else>
+      <v-col>
+        <v-label>
+          Sorry, no free rooms available!
+        </v-label>
+      </v-col>
+    </v-row>
     <v-row v-for="roomType in availableRoomTypes" :key="roomType.id">
       <v-col>
         <v-hover>
