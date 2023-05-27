@@ -1,20 +1,19 @@
 <template>
   <v-container>
     <v-card>
-      <v-list>
-        <v-label class="ml-4 py-2 text-h6"> Price Range</v-label>
+      <v-list v-if="roomTypes.length > 0">
+        <v-label class="ml-4 pt-2 text-h6"> Price per night</v-label>
         <v-list-item>
           <v-range-slider
             class="py-2 pr-4 mt-6"
             strict
             v-model="priceRange"
-            :min="10"
-            :max="500"
+            :min="min"
+            :max="max"
             :step="10"
             show-ticks="always"
-            :ticks="[]"
+            :ticks="roomTypes.map((rt) => rt.pricePerNight)"
             prepend-icon="mdi-currency-eur"
-            label="Price per night"
             thumb-label="always"
             @update:modelValue="setPrice"
           >
@@ -40,6 +39,9 @@
           </v-switch>
         </v-list-item>
       </v-list>
+      <v-list v-else>
+        <v-label class="ml-4 pt-2 text-h6" style="height: 300px">No filters available</v-label>
+      </v-list>
     </v-card>
   </v-container>
 </template>
@@ -53,12 +55,21 @@ export default {
       amenitiesFilters: [],
       maxPrice: null,
       minPrice: null,
-      priceRange: [10, 500],
+      priceRange: [0, 0],
     };
   },
   computed: {
     ...mapGetters("roomType", ["availableFilters"]),
-    ...mapState("roomType", ["activeAmenitiesFilters"]),
+    ...mapState("roomType", ["activeAmenitiesFilters", "roomTypes"]),
+    prices() {
+      return this.roomTypes ? this.roomTypes.map((rt) => rt.pricePerNight) : [];
+    },
+    min() {
+      return 10;
+    },
+    max() {
+      return 500;
+    },
   },
   methods: {
     ...mapMutations("roomType", ["setActiveAmenitiesFilters", "setFilters"]),
@@ -66,11 +77,15 @@ export default {
       this.setActiveAmenitiesFilters(this.amenitiesFilters);
     },
     setPrice() {
-      this.setFilters({ minPrice: this.priceRange[0], maxPrice: this.priceRange[1] });
+      this.setFilters({
+        minPrice: this.priceRange[0],
+        maxPrice: this.priceRange[1],
+      });
     },
   },
   created() {
     this.amenitiesFilters = this.activeAmenitiesFilters;
+    this.priceRange = [this.min, this.max];
   },
 };
 </script>

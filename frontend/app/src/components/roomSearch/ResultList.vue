@@ -69,7 +69,7 @@
   </v-container>
   <v-container v-else class="fill-height">
     <v-row justify="center" align="center">
-      <v-col class="text-center">
+      <v-col class="text-left">
         <p class="mb-2">
           <v-icon size="10vh" style="opacity: 0.3"
             >mdi-emoticon-sad-outline</v-icon

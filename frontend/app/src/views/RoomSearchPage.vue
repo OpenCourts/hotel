@@ -1,40 +1,57 @@
 <template>
   <base-view>
-    <v-container v-if="!isLoading">
+    <v-container v-if="!hasClickedSearch && roomTypes.length == 0">
+      <v-row class="mt-10">
+        <v-col class="text-center">
+          <base-logo />
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12" class="text-center">
+          <span class="text-overline" style="font-size: 2em !important"
+            >Search</span
+          >
+          <v-icon style="font-size: 5em" class="ml-2 mr-0">mdi-magnify</v-icon>
+          <span class="text-overline" style="font-size: 2em !important"
+            >rooms</span
+          >
+        </v-col>
+      </v-row>
       <v-row>
         <v-col cols="4">
           <hotel-picker />
         </v-col>
-        <v-col cols="3">
+        <v-col cols="4">
           <number-of-persons-picker />
         </v-col>
-        <v-col cols="3"> <date-range-picker /></v-col>
-        <v-col cols="2">
-          <v-btn
-            :disabled="!allApiFiltersSet || loadingRoomTypes"
-            @click="searchRoomTypes"
-            style="height: 4em; width: 100%"
-            >Search</v-btn
-          ></v-col
-        >
+        <v-col cols="4"> <date-range-picker /></v-col>
       </v-row>
-      <v-row>
-        <v-col cols="4"><filter-list /></v-col>
-        <v-col cols="8">
-          <div
-            :style="`opacity: ${
-              hasClickedSearch && loadingRoomTypes ? 0.5 : 1
-            }; transition: all .1s`"
-          >
-            <base-spinner
-              class="mt-5"
-              v-if="loadingRoomTypes && !hasClickedSearch"
-            />
-            <result-list
-              v-else-if="hasClickedSearch || roomTypes.length > 0"
-            /></div
-        ></v-col>
-      </v-row>
+    </v-container>
+    <v-container fluid v-else-if="!isLoading">
+      <div class="px-5">
+        <v-row>
+          <v-col cols="4">
+            <hotel-picker />
+          </v-col>
+          <v-col cols="4">
+            <number-of-persons-picker />
+          </v-col>
+          <v-col cols="4"> <date-range-picker /></v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="4"><filter-list /> </v-col>
+          <v-col cols="8">
+            <div
+              :style="`opacity: ${
+                hasClickedSearch && loadingRoomTypes ? 0.5 : 1
+              }; transition: all .1s`"
+            >
+              <div :class="loadingRoomTypes ? 'overlay' : ''">
+                <result-list />
+              </div></div
+          ></v-col>
+        </v-row>
+      </div>
     </v-container>
     <v-container class="fill-height" v-else>
       <v-row justify="center" align="center">
@@ -55,6 +72,7 @@ import FilterList from "../components/roomSearch/FilterList.vue";
 import HotelPicker from "../components/roomSearch/HotelPicker.vue";
 import NumberOfPersonsPicker from "../components/roomSearch/NumberOfPersonsPicker.vue";
 import ResultList from "../components/roomSearch/ResultList.vue";
+import BaseLogo from "../components/BaseLogo.vue";
 export default {
   components: {
     BaseView,
@@ -64,6 +82,7 @@ export default {
     FilterList,
     ResultList,
     BaseSpinner,
+    BaseLogo,
   },
   name: "room-search-page",
   data() {
@@ -122,4 +141,7 @@ export default {
 </script>
 
 <style>
+.overlay {
+  opacity: 0.6;
+}
 </style>

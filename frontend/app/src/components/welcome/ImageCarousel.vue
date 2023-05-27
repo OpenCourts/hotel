@@ -48,7 +48,7 @@ export default {
 
 <style scoped>
 .img-wrapper img {
-  height: 20em;
+  height: 30vh;
   margin: 0 1px;
   object-fit: cover;
   width: 30vw;

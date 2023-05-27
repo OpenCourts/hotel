@@ -11,7 +11,6 @@
     <v-menu
       activator="parent"
       :close-on-content-click="false"
-      @click:outside="updateGuests"
     >
       <v-list>
         <v-list-item>
@@ -63,13 +62,13 @@ export default {
       return `${this.valuePersons} person${this.valuePersons == 1 ? "" : "s"}`;
     },
   },
-  // watch: {
-  //   valuePersons: {
-  //     handler: function () {
-  //       this.updateGuests();
-  //     },
-  //   },
-  // },
+  watch: {
+    valuePersons: {
+      handler: function () {
+        this.updateGuests();
+      },
+    },
+  },
   methods: {
     ...mapMutations("roomType", ["setApiFilters"]),
     updateGuests() {

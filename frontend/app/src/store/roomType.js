@@ -26,14 +26,13 @@ const roomTypeModule = {
         nonAvailableTypes(state) {
             return state.roomTypes.filter(rt => !rt.isAvailable)
         },
-        availableFilters(_, getters) {
-            if (!getters.filteredRoomTypes) return []
-            const roomTypeAmenities = getters.filteredRoomTypes.map(rt => rt.amenities).flat(1)
+        availableFilters(state) {
+            if (!state.roomTypes) return []
+            const roomTypeAmenities = state.roomTypes.map(rt => rt.amenities).flat(1)
             return [...new Set(roomTypeAmenities)]
         },
         filteredRoomTypes(state) {
             return state.roomTypes.filter(rt => {
-                if (rt.roomCount == 0) return false
                 for (const activeFilter of state.activeAmenitiesFilters) {
                     if (!rt.amenities.includes(activeFilter)) { return false }
                 }
@@ -94,9 +93,9 @@ const roomTypeModule = {
                 rt.amenities = rt.amenities.split(", ");
                 rt.availableRooms = rt.room_available_count ?? 2;
                 rt.image = process.env.VUE_APP_HOTELS_SERVER_LOCATION + rt.image_url
-                rt.roomCount = rt.room_count
             })
-            commit("setRoomTypes", roomTypes)
+            const existingRoomTypes = roomTypes.filter(rt => rt.room_count > 0)
+            commit("setRoomTypes", existingRoomTypes)
         },
     }
 }

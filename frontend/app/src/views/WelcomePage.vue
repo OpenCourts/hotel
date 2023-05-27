@@ -3,29 +3,7 @@
     <image-carousel />
     <v-container class="mb-10">
       <v-row no-gutters>
-        <v-col class="text-center">
-          <p
-            class="welcome-text"
-            style="letter-spacing: 13px; padding-left: 13px; top: 25px"
-          >
-            SIX STAR
-          </p>
-        </v-col>
-      </v-row>
-      <v-row no-gutters>
-        <v-col class="text-center">
-          <v-rating :length="6" size="large" readonly :model-value="6" />
-        </v-col>
-      </v-row>
-      <v-row no-gutters>
-        <v-col class="text-center">
-          <p
-            class="welcome-text"
-            style="letter-spacing: 23px; padding-left: 23px; bottom: 30px"
-          >
-            HOTELS
-          </p>
-        </v-col>
+          <base-logo />
       </v-row>
       <v-row>
         <p class="text-justify paragraph">
@@ -73,10 +51,11 @@
 </template>
 
 <script>
+import BaseLogo from '../components/BaseLogo.vue';
 import BaseView from "../components/BaseView.vue";
-import ImageCarousel from "../components/welcome/ImageCarousel.vue";
+import ImageCarousel from '../components/welcome/ImageCarousel.vue';
 export default {
-  components: { BaseView, ImageCarousel },
+  components: { BaseView, BaseLogo, ImageCarousel },
   name: "welcome-page",
 };
 </script>
