@@ -23,7 +23,7 @@ impl Fairing for CORS {
     fn info(&self) -> Info {
         Info {
             name: "Add CORS headers to responses",
-            kind: Kind::Response
+            kind: Kind::Response,
         }
     }
 
@@ -40,8 +40,10 @@ pub fn rocket() -> Rocket<Build> {
     let mut rc = rocket::build()
         .attach(sqlx::stage())
         .attach(CORS)
-        .mount("/", FileServer::from("static/"));
-        //.register("/", catchers![not_found]);
+        .mount("/", FileServer::from("static/"))
+        .mount("/search", FileServer::from("static/"))
+        .mount("/book", FileServer::from("static/"));
+    //.register("/", catchers![not_found]);
     // mount the api (/api)
     rc = api::build_api(rc, "/api");
     rc
