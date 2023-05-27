@@ -1,9 +1,10 @@
 #[macro_use]
 extern crate rocket;
 
+use std::path::Path;
 use rocket::{Build, Request, Response, Rocket};
 use rocket::fairing::{Fairing, Info, Kind};
-use rocket::fs::FileServer;
+use rocket::fs::{FileServer, NamedFile};
 use rocket::http::Header;
 
 pub mod api;
@@ -35,12 +36,19 @@ impl Fairing for CORS {
     }
 }
 
+#[catch(404)] // Catch-all route for unmatched routes
+async fn catch_all() -> Option<NamedFile> {
+    let file_path = Path::new("static/index.html");
+    NamedFile::open(file_path).await.ok()
+}
+
 #[launch]
 pub fn rocket() -> Rocket<Build> {
     let mut rc = rocket::build()
         .attach(sqlx::stage())
         .attach(CORS)
-        .mount("/*", FileServer::from("static/"));
+        .mount("/", FileServer::from("static/"))
+        .register("/", catchers![catch_all]);
     //.register("/", catchers![not_found]);
     // mount the api (/api)
     rc = api::build_api(rc, "/api");
