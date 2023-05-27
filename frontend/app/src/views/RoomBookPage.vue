@@ -144,7 +144,7 @@ export default {
       isBooking: false,
       bookingSuccessful: false,
       bookingFailed: false,
-      bookingIsLoading: false
+      bookingIsLoading: false,
     };
   },
   computed: {
@@ -174,12 +174,18 @@ export default {
       "clearBookingInformation",
     ]),
     ...mapActions("booking", ["submitBooking"]),
+    ...mapActions("roomType", ["loadRoomTypes"]),
     async book() {
       this.isBooking = true;
       this.bookingIsLoading = true;
       try {
         await this.submitBooking();
         this.bookingSuccessful = true;
+        try {
+          await this.loadRoomTypes();
+        } catch (e) {
+          console.error(e);
+        }
       } catch (e) {
         console.error(e);
         this.bookingSuccessful = false;
