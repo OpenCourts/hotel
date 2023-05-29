@@ -5,7 +5,7 @@ use rocket::http::Status;
 use rocket::response::status::Custom;
 use rocket::serde::json::Json;
 use rocket_db_pools::Connection;
-use sqlx::{Error, FromRow};
+use sqlx::{Error, FromRow, query};
 use chrono::{Datelike, NaiveDate};
 use rocket::State;
 use tera::Context;
@@ -222,16 +222,24 @@ pub async fn check_room_availability(from_date: &str, to_date: &str, room_type_i
 
 pub async fn create_guests(guests: &[Guest], conn: &Db) -> Result<Vec<i32>, Status>{
     let mut query_string = String::new();
+    let mut first = true;
+    let guests_old_max_id = get_max_id_off_table("guests", conn).await.unwrap();
+    query_string.push_str("insert into guests (guest_name, guest_email, guest_phone_number, guest_address, guest_passport_number) values ");
     for guest in guests {
-        query_string.push_str(format!("insert into guests (guest_name, guest_email, guest_phone_number, guest_address, guest_passport_number) values ('{}', '{}', '{}', '{}', '{}');", guest.name, guest.email, guest.phone_number, guest.address, guest.passport_number).as_str());
+        if first {
+            first = false;
+        } else {
+            query_string.push_str(",");
+        }
+        query_string.push_str(format!("('{}', '{}', '{}', '{}', '{}')", guest.name, guest.email, guest.phone_number, guest.address, guest.passport_number).as_str());
     }
+    query_string.push_str(";");
     let result = sqlx::query(query_string.as_str())
         .execute(&**conn)
         .await;
     match result {
         Ok(val) => {
             let mut return_vec: Vec<i32> = Vec::new();
-            let guests_old_max_id = get_max_id_off_table("guests", conn).await.unwrap();
             for i in guests_old_max_id..guests_old_max_id+val.rows_affected() as i32 {
                 println!("Guestvec hinzugefügt: {}", i);
                 return_vec.push(i)
@@ -270,9 +278,17 @@ pub async fn create_booking(booking: &Booking,main_guest_id: i32, conn: &Db) -> 
 pub async fn create_guest_booking(guest_ids: &[i32], booking_id: i32, conn: &Db) -> Result<i32, Status>{
     println!("in create_guest_booking");
     let mut query_string = String::new();
+    let mut first = true;
+    query_string.push_str("insert into guests_bookings (guest_id, booking_id) values ");
     for id in guest_ids {
-        query_string.push_str(format!("insert into guests_bookings (guest_id, booking_id) values ({}, {});", *id, booking_id).as_str());
+        if first {
+            first = false;
+        } else {
+            query_string.push_str(",");
+        }
+        query_string.push_str(format!("({}, {})", *id, booking_id).as_str());
     }
+    query_string.push_str(";");
     let result = sqlx::query(query_string.as_str())
         .execute(&**conn)
         .await;
